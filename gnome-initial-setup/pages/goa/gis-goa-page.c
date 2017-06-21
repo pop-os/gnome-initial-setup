@@ -57,6 +57,13 @@ struct _ProviderWidget {
 };
 typedef struct _ProviderWidget ProviderWidget;
 
+struct _GisGoaProviderGetAllData {
+  GMainLoop *loop;
+  GList *providers;
+  GError *error;
+};
+typedef struct _GisGoaProviderGetAllData GisGoaProviderGetAllData;
+
 static void
 sync_provider_widget (ProviderWidget *provider_widget)
 {
@@ -108,6 +115,17 @@ add_account_to_provider (ProviderWidget *provider_widget)
 
  out:
   gtk_widget_destroy (dialog);
+}
+
+static void
+get_all_providers_cb (GObject      *source,
+                      GAsyncResult *res,
+                      gpointer     *user_data)
+{
+  GisGoaProviderGetAllData *data = user_data;
+  
+  goa_provider_get_all_finish (&data->providers, res, &data->error);
+  g_main_loop_quit(data->loop);
 }
 
 static void
@@ -175,10 +193,32 @@ add_provider_to_list (GisGoaPage *page, const char *provider_type)
 static void
 populate_provider_list (GisGoaPage *page)
 {
-  add_provider_to_list (page, "google");
-  add_provider_to_list (page, "owncloud");
-  add_provider_to_list (page, "windows_live");
-  add_provider_to_list (page, "facebook");
+  GisGoaProviderGetAllData data = {0,};
+  GoaProvider *provider;
+  GList *l;
+  
+  data.loop = g_main_loop_new (NULL, FALSE);
+  goa_provider_get_all (get_all_providers_cb, &data);
+  g_main_loop_run(data.loop);
+  
+  if (data.error != NULL) {
+    g_error_free (data.error);
+    g_main_loop_unref (data.loop);
+    g_list_free_full (data.providers, g_object_unref);
+    return;
+  }
+  
+  for (l = data.providers; l != NULL; l = l->next) {
+    gchar *provider_type;
+    
+    provider = GOA_PROVIDER (l->data);
+    provider_type = goa_provider_get_provider_type (provider);
+    add_provider_to_list (page, provider_type);
+    provider = NULL;
+  }
+  
+  g_main_loop_unref (data.loop);
+  g_list_free_full (data.providers, g_object_unref);
 }
 
 static void
