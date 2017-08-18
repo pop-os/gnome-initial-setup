@@ -44,6 +44,9 @@ Depends: ${shlibs:Depends},
          gnome-settings-daemon (>= 3.24),
          ${misc:Depends}
 Recommends: gnome-getting-started-docs
+Provides: gnome-initial-setup
+Conflicts: gnome-initial-setup
+Replaces: gnome-initial-setup
 Description: Initial GNOME system setup helper
  After acquiring or installing a new system there are a few essential things
  to set up before use. GNOME Initial Setup aims to provide a simple, easy,
