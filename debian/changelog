@@ -1,0 +1,9 @@
+pop-gnome-initial-setup (3.25.4-0) artful; urgency=medium
+
+  * Initial release
+  * Show all gnome online account providers
+  * Ignore password strength
+  * Do not launch yelp
+  * Encrypted home support
+
+ -- Jeremy Soller <jeremy@system76.com>  Fri, 18 Aug 2017 11:12:39 -0600
