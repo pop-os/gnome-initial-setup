@@ -1,0 +1,56 @@
+Source: pop-gnome-initial-setup
+Section: gnome
+Priority: optional
+Maintainer: Jeremy Soller <jeremy@system76.com>
+Build-Depends: debhelper (>= 10),
+               geoclue-2.0 (>= 2.3.1),
+               gnome-common,
+               gnome-pkg-tools (>= 0.13),
+               intltool (>= 0.40),
+               iso-codes,
+               libaccountsservice-dev,
+               libcheese-gtk-dev (>= 3.3.5),
+               libfontconfig1-dev,
+               libgdm-dev (>= 3.8.3),
+               libgeoclue-2-dev (>= 2.3.1),
+               libgeocode-glib-dev,
+               libglib2.0-dev (>= 2.46.0),
+               libgnome-desktop-3-dev (>= 3.7.5),
+               libgoa-1.0-dev,
+               libgoa-backend-1.0-dev,
+               libgtk-3-dev (>= 3.19.12),
+               libgweather-3-dev (>= 3.13.91),
+               libibus-1.0-dev (>= 1.5.2),
+               libjson-glib-dev,
+               libkrb5-dev,
+               libnm-dev (>= 1.2),
+               libnma-dev (>= 1.0),
+               libpackagekit-glib2-dev (>= 1.1.4),
+               libpango1.0-dev (>= 1.32.5),
+               libpolkit-gobject-1-dev (>= 0.103),
+               libpwquality-dev,
+               librest-dev,
+               libsecret-1-dev,
+               libwebkit2gtk-4.0-dev
+Standards-Version: 3.9.8
+Homepage: https://github.com/system76/gnome-initial-setup
+
+Package: pop-gnome-initial-setup
+Architecture: linux-any
+Depends: ${shlibs:Depends},
+         gdm3,
+         policykit-1 (>= 0.103),
+         adduser,
+         gnome-settings-daemon (>= 3.24),
+         ${misc:Depends}
+Recommends: gnome-getting-started-docs
+Description: Initial GNOME system setup helper
+ After acquiring or installing a new system there are a few essential things
+ to set up before use. GNOME Initial Setup aims to provide a simple, easy,
+ and safe way to prepare a new system.
+ .
+ GNOME Initial Setup runs the first time you log in to the GNOME desktop
+ and lets you easily configure your language, keyboard layout, online accounts
+ integration, and more.
+ .
+ If you want to configure these things at any other time, run the Settings app.
