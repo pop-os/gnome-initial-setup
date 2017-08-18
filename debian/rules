@@ -8,6 +8,7 @@ export DEB_LDFLAGS_MAINT_APPEND = -Wl,-z,defs -Wl,-O1 -Wl,--as-needed
 	dh $@ --parallel --with gnome
 
 override_dh_auto_configure:
+	NOCONFIGURE=1 ./autogen.sh
 	dh_auto_configure -- \
 		--libexecdir=/usr/lib/gnome-initial-setup \
 		--enable-software-sources
