@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.25.4-3) artful; urgency=medium
+
+  * Fix style of encrypt home toggle
+
+ -- Jeremy Soller <jeremy@system76.com>  Mon, 21 Aug 2017 14:06:19 -0600
+
 pop-gnome-initial-setup (3.25.4-2) artful; urgency=medium
 
   * Update to replace gnome-initial-setup
