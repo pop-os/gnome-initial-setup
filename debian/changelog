@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.25.4-6) artful; urgency=medium
+
+  * Fix underscores in distro name
+
+ -- Jeremy Soller <jeremy@system76.com>  Wed, 23 Aug 2017 13:52:22 -0600
+
 pop-gnome-initial-setup (3.25.4-5) artful; urgency=medium
 
   * Disable buggy language chooser
