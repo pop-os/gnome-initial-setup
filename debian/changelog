@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.25.4-7) artful; urgency=medium
+
+  * Use pop-accountsservice
+
+ -- Jeremy Soller <jeremy@system76.com>  Fri, 25 Aug 2017 16:33:04 -0600
+
 pop-gnome-initial-setup (3.25.4-6) artful; urgency=medium
 
   * Fix underscores in distro name
