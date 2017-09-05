@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 10),
                gnome-pkg-tools (>= 0.13),
                intltool (>= 0.40),
                iso-codes,
-               pop-libaccountsservice-dev,
+               libaccountsservice-dev,
                libcheese-gtk-dev (>= 3.3.5),
                libfontconfig1-dev,
                libgdm-dev (>= 3.8.3),
@@ -46,7 +46,7 @@ Depends: ${shlibs:Depends},
          policykit-1 (>= 0.103),
          adduser,
          gnome-settings-daemon (>= 3.24),
-         pop-accountsservice,
+         accountsservice,
          ${misc:Depends}
 Recommends: gnome-getting-started-docs
 Provides: gnome-initial-setup

@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.25.4-8) artful; urgency=medium
+
+  * Revert use of pop-accountsservice
+
+ -- Jeremy Soller <jeremy@system76.com>  Tue, 05 Sep 2017 10:35:57 -0600
+
 pop-gnome-initial-setup (3.25.4-7) artful; urgency=medium
 
   * Use pop-accountsservice
