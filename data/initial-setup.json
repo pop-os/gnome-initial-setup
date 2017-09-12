@@ -5,5 +5,5 @@
                "center": [],
                "right": ["a11yGreeter", "keyboard", "aggregateMenu"]
     },
-    "stylesheet": "gdm3.css"
+    "stylesheetName": "gdm3.css"
 }
