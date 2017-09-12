@@ -1,3 +1,10 @@
+pop-gnome-initial-setup (3.26.0-0) artful; urgency=medium
+
+  * Update to 3.26.0
+  * Use gdm3.css stylesheet
+
+ -- Jeremy Soller <jeremy@system76.com>  Tue, 12 Sep 2017 12:53:55 -0600
+
 pop-gnome-initial-setup (3.25.4-8) artful; urgency=medium
 
   * Revert use of pop-accountsservice
