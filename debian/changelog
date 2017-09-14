@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.26.0-2) artful; urgency=medium
+
+  * Force patched accountsservice version
+
+ -- Jeremy Soller <jackpot51@gmail.com>  Wed, 13 Sep 2017 18:17:07 -0600
+
 pop-gnome-initial-setup (3.26.0-1) artful; urgency=medium
 
   * Fix stylesheet property
