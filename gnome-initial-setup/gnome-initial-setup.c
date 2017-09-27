@@ -212,6 +212,9 @@ main (int argc, char *argv[])
   GOptionContext *context;
   GisDriverMode mode;
 
+  // Reset scaling factor to fix HiDPI issue
+  system("gsettings reset org.gnome.desktop.interface scaling-factor");
+
   GOptionEntry entries[] = {
     { "existing-user", 0, 0, G_OPTION_ARG_NONE, &force_existing_user_mode,
       _("Force existing user mode"), NULL },
