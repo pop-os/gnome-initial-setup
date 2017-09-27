@@ -290,8 +290,9 @@ update_distro_name (GisSummaryPage *page)
   gsize name_len;
   char *text;
 
-  name_c = NULL;
+  name_c = g_strdup ("Pop!_OS");
 
+  /*
   if (g_file_get_contents ("/etc/os-release", &buffer, NULL, NULL))
     {
       name_c = get_item (buffer, "NAME");
@@ -300,6 +301,7 @@ update_distro_name (GisSummaryPage *page)
 
   if (!name_c)
     name_c = g_strdup ("GNOME 3");
+  */
 
   // Copy to a gstring for escaping functions below
   name = g_string_new(name_c);
