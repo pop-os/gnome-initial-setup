@@ -1,3 +1,10 @@
+pop-gnome-initial-setup (3.26.0-5) artful; urgency=medium
+
+  * Revert hardcoding of distro name
+  * Move scaling factor to later on in the main function
+
+ -- Jeremy Soller <jeremy@system76.com>  Thu, 28 Sep 2017 12:28:50 -0600
+
 pop-gnome-initial-setup (3.26.0-4) artful; urgency=medium
 
   * Reset scaling-factor to fix HiDPI issue
