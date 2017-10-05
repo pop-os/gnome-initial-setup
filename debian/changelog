@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.26.0-6) artful; urgency=medium
+
+  * Fix timezone page when there is not internet connection
+
+ -- Jeremy Soller <jeremy@system76.com>  Thu, 05 Oct 2017 11:22:23 -0600
+
 pop-gnome-initial-setup (3.26.0-5) artful; urgency=medium
 
   * Revert hardcoding of distro name
