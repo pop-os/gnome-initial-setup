@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.26.0-7) artful; urgency=medium
+
+  * Update patched accountsservice
+
+ -- Jeremy Soller <jeremy@system76.com>  Tue, 10 Oct 2017 10:45:59 -0600
+
 pop-gnome-initial-setup (3.26.0-6) artful; urgency=medium
 
   * Fix timezone page when there is not internet connection
