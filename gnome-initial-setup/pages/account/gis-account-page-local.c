@@ -50,7 +50,6 @@ struct _GisAccountPageLocalPrivate
   GtkWidget *username_combo;
   gboolean   has_custom_username;
   GtkWidget *username_explanation;
-  GtkWidget *encrypt_home_switch;
   UmPhotoDialog *photo_dialog;
 
   gint timeout_id;
@@ -497,14 +496,12 @@ local_create_user (GisAccountPageLocal *page)
   GisAccountPageLocalPrivate *priv = gis_account_page_local_get_instance_private (page);
   const gchar *username;
   const gchar *fullname;
-  gboolean encrypt_home;
   GError *error = NULL;
 
   username = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (priv->username_combo));
   fullname = gtk_entry_get_text (GTK_ENTRY (priv->fullname_entry));
-  encrypt_home = gtk_switch_get_state (GTK_SWITCH (priv->encrypt_home_switch));
 
-  priv->act_user = act_user_manager_create_user_encrypt (priv->act_client, username, fullname, priv->account_type, encrypt_home, &error);
+  priv->act_user = act_user_manager_create_user (priv->act_client, username, fullname, priv->account_type, &error);
   if (error != NULL) {
     g_warning ("Failed to create user: %s", error->message);
     g_error_free (error);
@@ -532,7 +529,6 @@ gis_account_page_local_class_init (GisAccountPageLocalClass *klass)
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, fullname_entry);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, username_combo);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, username_explanation);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, encrypt_home_switch);
 
   object_class->constructed = gis_account_page_local_constructed;
   object_class->dispose = gis_account_page_local_dispose;
