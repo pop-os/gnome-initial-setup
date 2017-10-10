@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.26.0-8) artful; urgency=medium
+
+  * Disable encrypted home
+
+ -- Jeremy Soller <jeremy@system76.com>  Tue, 10 Oct 2017 11:51:40 -0600
+
 pop-gnome-initial-setup (3.26.0-7) artful; urgency=medium
 
   * Update patched accountsservice
