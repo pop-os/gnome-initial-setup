@@ -26,7 +26,6 @@
             <property name="halign">center</property>
           </object>
         </child>
-<!-- Disable until language chooser supports Ubuntu language packs
         <child>
           <object class="CcLanguageChooser" id="language_chooser">
             <property name="margin_bottom">18</property>
@@ -35,7 +34,6 @@
             <property name="valign">start</property>
           </object>
         </child>
--->
       </object>
     </child>
   </template>
