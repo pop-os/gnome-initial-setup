@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.26.0-9~alpha0) artful; urgency=medium
+
+  * Language support
+
+ -- Jeremy Soller <jeremy@system76.com>  Wed, 11 Oct 2017 09:16:02 -0600
+
 pop-gnome-initial-setup (3.26.0-8) artful; urgency=medium
 
   * Disable encrypted home
