@@ -1,7 +1,7 @@
-Source: pop-gnome-initial-setup
+Source: rareos-gnome-initial-setup
 Section: gnome
 Priority: optional
-Maintainer: Jeremy Soller <jeremy@system76.com>
+Maintainer: Kian Moretz <kian@orioncomputing.net>
 Build-Depends: debhelper (>= 10),
                geoclue-2.0 (>= 2.3.1),
                gnome-common,
@@ -33,9 +33,9 @@ Build-Depends: debhelper (>= 10),
                libsecret-1-dev,
                libwebkit2gtk-4.0-dev
 Standards-Version: 3.9.8
-Homepage: https://github.com/system76/gnome-initial-setup
+Homepage: https://github.com/rareos/gnome-initial-setup
 
-Package: pop-gnome-initial-setup
+Package: rareos-gnome-initial-setup
 Architecture: linux-any
 Depends: ${shlibs:Depends},
          gdm3,

@@ -2,7 +2,7 @@
 #
 # Modifications should be made to debian/control.in instead.
 # This file is regenerated automatically in the clean target.
-Source: pop-gnome-initial-setup
+Source: rareos-gnome-initial-setup
 Section: gnome
 Priority: optional
 Maintainer: Jeremy Soller <jeremy@system76.com>
@@ -39,7 +39,7 @@ Build-Depends: debhelper (>= 10),
 Standards-Version: 3.9.8
 Homepage: https://github.com/system76/gnome-initial-setup
 
-Package: pop-gnome-initial-setup
+Package: rareos-gnome-initial-setup
 Architecture: linux-any
 Depends: ${shlibs:Depends},
          gdm3,
