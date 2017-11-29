@@ -45,6 +45,7 @@ Depends: ${shlibs:Depends},
          gdm3,
          policykit-1 (>= 0.103),
          adduser,
+         ecryptfs-utils,
          gnome-settings-daemon (>= 3.24),
          accountsservice (>= 0.6.42-0ubuntu3pop0),
          ${misc:Depends}
