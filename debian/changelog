@@ -1,3 +1,9 @@
+pop-gnome-initial-setup (3.26.0-11) artful; urgency=medium
+
+  * Fix username filter
+
+ -- Jeremy Soller <jeremy@system76.com>  Mon, 27 Nov 2017 10:50:18 -0700
+
 pop-gnome-initial-setup (3.26.0-10) artful; urgency=medium
 
   * Disable language chooser again
