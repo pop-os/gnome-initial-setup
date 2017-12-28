@@ -497,14 +497,17 @@ local_create_user (GisAccountPageLocal *page)
   GisAccountPageLocalPrivate *priv = gis_account_page_local_get_instance_private (page);
   const gchar *username;
   const gchar *fullname;
-  gboolean encrypt_home;
+  ActUserAccountType account_type;
   GError *error = NULL;
 
   username = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (priv->username_combo));
   fullname = gtk_entry_get_text (GTK_ENTRY (priv->fullname_entry));
-  encrypt_home = gtk_switch_get_state (GTK_SWITCH (priv->encrypt_home_switch));
+  account_type = priv->account_type;
+  if (gtk_switch_get_state (GTK_SWITCH (priv->encrypt_home_switch))) {
+      account_type |= ACT_USER_ACCOUNT_FLAG_ENCRYPT;
+  }
 
-  priv->act_user = act_user_manager_create_user_encrypt (priv->act_client, username, fullname, priv->account_type, encrypt_home, &error);
+  priv->act_user = act_user_manager_create_user (priv->act_client, username, fullname, account_type, &error);
   if (error != NULL) {
     g_warning ("Failed to create user: %s", error->message);
     g_error_free (error);
