@@ -50,11 +50,15 @@
 #include "pages/summary/gis-summary-page.h"
 
 #define VENDOR_PAGES_GROUP "pages"
-#define VENDOR_PAGES_SKIP_KEY "skip"
+#define VENDOR_SKIP_KEY "skip"
+#define VENDOR_NEW_USER_ONLY_KEY "new_user_only"
+#define VENDOR_EXISTING_USER_ONLY_KEY "existing_user_only"
 
 static gboolean force_existing_user_mode;
 
-typedef void (*PreparePage) (GisDriver *driver);
+static GPtrArray *skipped_pages;
+
+typedef GisPage *(*PreparePage) (GisDriver *driver);
 
 typedef struct {
   const gchar *page_id;
@@ -101,21 +105,40 @@ should_skip_page (GisDriver    *driver,
 }
 
 static gchar **
-pages_to_skip_from_file (void)
+strv_append (gchar **a,
+             gchar **b)
+{
+  guint n = g_strv_length (a);
+  guint m = g_strv_length (b);
+
+  a = g_renew (gchar *, a, n + m + 1);
+  for (guint i = 0; i < m; i++)
+    a[n + i] = g_strdup (b[i]);
+  a[n + m] = NULL;
+
+  return a;
+}
+
+static gchar **
+pages_to_skip_from_file (gboolean is_new_user)
 {
   GKeyFile *skip_pages_file;
   gchar **skip_pages = NULL;
+  gchar **additional_skip_pages = NULL;
   GError *error = NULL;
 
   /* VENDOR_CONF_FILE points to a keyfile containing vendor customization
    * options. This code will look for options under the "pages" group, and
    * supports the following keys:
-   *   - skip (optional): list of pages to be skipped.
+   *   - skip (optional): list of pages to be skipped always
+   *   - new_user_only (optional): list of pages to be skipped in existing user mode
+   *   - existing_user_only (optional): list of pages to be skipped in new user mode
    *
-   * This is how this file would look on a vendor image:
+   * This is how this file might look on a vendor image:
    *
    *   [pages]
-   *   skip=language
+   *   skip=timezone
+   *   existing_user_only=language;keyboard
    */
   skip_pages_file = g_key_file_new ();
   if (!g_key_file_load_from_file (skip_pages_file, VENDOR_CONF_FILE,
@@ -127,8 +150,20 @@ pages_to_skip_from_file (void)
     goto out;
   }
 
-  skip_pages = g_key_file_get_string_list (skip_pages_file, VENDOR_PAGES_GROUP,
-                                           VENDOR_PAGES_SKIP_KEY, NULL, NULL);
+  skip_pages = g_key_file_get_string_list (skip_pages_file,
+                                           VENDOR_PAGES_GROUP,
+                                           VENDOR_SKIP_KEY, NULL, NULL);
+  additional_skip_pages = g_key_file_get_string_list (skip_pages_file,
+                                                      VENDOR_PAGES_GROUP,
+                                                      is_new_user ? VENDOR_EXISTING_USER_ONLY_KEY : VENDOR_NEW_USER_ONLY_KEY,
+                                                      NULL, NULL);
+
+  if (!skip_pages && additional_skip_pages) {
+    skip_pages = additional_skip_pages;
+  } else if (skip_pages && additional_skip_pages) {
+    skip_pages = strv_append (skip_pages, additional_skip_pages);
+    g_strfreev (additional_skip_pages);
+  }
 
  out:
   g_key_file_free (skip_pages_file);
@@ -159,17 +194,18 @@ static void
 rebuild_pages_cb (GisDriver *driver)
 {
   PageData *page_data;
+  GisPage *page;
   GisAssistant *assistant;
   GisPage *current_page;
   gchar **skip_pages;
-  gboolean is_new_user;
+  gboolean is_new_user, skipped;
 
   assistant = gis_driver_get_assistant (driver);
   current_page = gis_assistant_get_current_page (assistant);
-
-  skip_pages = pages_to_skip_from_file ();
-
   page_data = page_table;
+
+  g_ptr_array_free (skipped_pages, TRUE);
+  skipped_pages = g_ptr_array_new_with_free_func ((GDestroyNotify) gtk_widget_destroy);
 
   if (current_page != NULL) {
     destroy_pages_after (assistant, current_page);
@@ -182,14 +218,23 @@ rebuild_pages_cb (GisDriver *driver)
   }
 
   is_new_user = (gis_driver_get_mode (driver) == GIS_DRIVER_MODE_NEW_USER);
+  skip_pages = pages_to_skip_from_file (is_new_user);
+
   for (; page_data->page_id != NULL; ++page_data) {
-    if (page_data->new_user_only && !is_new_user)
+    skipped = FALSE;
+
+    if ((page_data->new_user_only && !is_new_user) ||
+        (should_skip_page (driver, page_data->page_id, skip_pages)))
+      skipped = TRUE;
+
+    page = page_data->prepare_page_func (driver);
+    if (!page)
       continue;
 
-    if (should_skip_page (driver, page_data->page_id, skip_pages))
-      continue;
-
-    page_data->prepare_page_func (driver);
+    if (skipped && gis_page_skip (page))
+      g_ptr_array_add (skipped_pages, page);
+    else
+      gis_driver_add_page (driver, page);
   }
 
   g_strfreev (skip_pages);
@@ -242,6 +287,7 @@ main (int argc, char *argv[])
   }
 #endif
 
+  skipped_pages = g_ptr_array_new_with_free_func ((GDestroyNotify) gtk_widget_destroy);
   mode = get_mode ();
 
   /* When we are running as the gnome-initial-setup user we
@@ -258,6 +304,8 @@ main (int argc, char *argv[])
   driver = gis_driver_new (mode);
   g_signal_connect (driver, "rebuild-pages", G_CALLBACK (rebuild_pages_cb), NULL);
   status = g_application_run (G_APPLICATION (driver), argc, argv);
+
+  g_ptr_array_free (skipped_pages, TRUE);
 
   g_object_unref (driver);
   g_option_context_free (context);
