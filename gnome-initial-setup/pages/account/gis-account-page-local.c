@@ -50,7 +50,6 @@ struct _GisAccountPageLocalPrivate
   GtkWidget *username_combo;
   gboolean   has_custom_username;
   GtkWidget *username_explanation;
-  GtkWidget *encrypt_home_switch;
   UmPhotoDialog *photo_dialog;
 
   gint timeout_id;
@@ -497,17 +496,12 @@ local_create_user (GisAccountPageLocal *page)
   GisAccountPageLocalPrivate *priv = gis_account_page_local_get_instance_private (page);
   const gchar *username;
   const gchar *fullname;
-  ActUserAccountType account_type;
   GError *error = NULL;
 
   username = gtk_combo_box_text_get_active_text (GTK_COMBO_BOX_TEXT (priv->username_combo));
   fullname = gtk_entry_get_text (GTK_ENTRY (priv->fullname_entry));
-  account_type = priv->account_type;
-  if (gtk_switch_get_state (GTK_SWITCH (priv->encrypt_home_switch))) {
-      account_type |= ACT_USER_ACCOUNT_FLAG_ENCRYPT;
-  }
 
-  priv->act_user = act_user_manager_create_user (priv->act_client, username, fullname, account_type, &error);
+  priv->act_user = act_user_manager_create_user (priv->act_client, username, fullname, priv->account_type, &error);
   if (error != NULL) {
     g_warning ("Failed to create user: %s", error->message);
     g_error_free (error);
@@ -535,7 +529,6 @@ gis_account_page_local_class_init (GisAccountPageLocalClass *klass)
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, fullname_entry);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, username_combo);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, username_explanation);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisAccountPageLocal, encrypt_home_switch);
 
   object_class->constructed = gis_account_page_local_constructed;
   object_class->dispose = gis_account_page_local_dispose;
@@ -589,5 +582,5 @@ void
 gis_account_page_local_shown (GisAccountPageLocal *local)
 {
   GisAccountPageLocalPrivate *priv = gis_account_page_local_get_instance_private (local);
-  gtk_widget_grab_focus (priv->fullname_entry);
+  gtk_widget_grab_focus (priv->fullname_entry); 
 }
