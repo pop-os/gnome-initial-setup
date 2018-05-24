@@ -382,12 +382,12 @@ gis_summary_page_constructed (GObject *object)
 
     gtk_image_set_from_pixbuf (
       left_image,
-        gdk_pixbuf_scale_simple (
-          gtk_image_get_pixbuf (left_image),
-            scale,
-            scale,
-            GDK_INTERP_BILINEAR
-        )
+      gdk_pixbuf_scale_simple (
+        gtk_image_get_pixbuf (left_image),
+        scale,
+        scale,
+        GDK_INTERP_BILINEAR
+      )
     );
   }
 
