@@ -334,25 +334,86 @@ update_distro_name (GisSummaryPage *page)
   g_string_free (name, TRUE);
 }
 
+static char*
+freadln (char* path)
+{
+  FILE *product = fopen (path, "r");
+  if (product == NULL) {
+      return NULL;
+  }
+
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read = getline (&line, &len, product);
+  fclose (product);
+  return line;
+}
+
 static u_int8_t
 has_switchable_graphics ()
 {
-  FILE *product = fopen ("/sys/class/dmi/id/product_version", "r");
-  if (product == NULL) {
-    return 0;
-  }
-
+  char *product_version = freadln ("/sys/class/dmi/id/product_version");
   u_int8_t has_switchable = 0;
-  char *line = NULL;
-  size_t len = 0;
-  ssize_t read = getline(&line, &len, product);
-  if (line) {
-    has_switchable = strstr (line, "oryp4") != NULL;
-    free (line);
+
+  if (product_version) {
+    has_switchable = strstr (product_version, "oryp4") != NULL;
+    free (product_version);
   }
 
-  fclose (product);
   return has_switchable;
+}
+
+static char*
+get_product_name ()
+{
+  return freadln ("/sys/class/dmi/id/product_name");
+}
+
+static void
+gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv) {
+    char *product_name = freadln ("/sys/class/dmi/id/product_name");
+    if (product_name) {
+      char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), product_name);
+      gtk_label_set_label (GTK_LABEL (priv->summary_title), title_string);
+      g_free (title_string);
+      free (product_name);
+    } else {
+      gtk_label_set_label (GTK_LABEL (priv->summary_title), _("Your System Has Switchable Graphics!"));
+    }
+}
+
+static void
+gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv)
+{
+  char *left_desc = _("Use the system menu on the top panel to switch between "
+    "Intel and NVIDIA graphics. Switching will prompt you to restart your "
+    "device.");
+
+  char *right_desc = _("To increase battery life, your Oryx Pro defaults to "
+    "Intel graphics. To use external displays, switch to NVIDIA graphics.");
+
+  gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
+  gtk_label_set_label (GTK_LABEL (priv->left_panel_description), left_desc);
+
+  gtk_label_set_line_wrap (GTK_LABEL (priv->right_panel_description), 1);
+  gtk_label_set_label (GTK_LABEL (priv->right_panel_description), right_desc);
+}
+
+static void
+gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv)
+{
+  GtkImage *left_image = GTK_IMAGE (priv->left_panel_image);
+  gint scale = gtk_widget_get_scale_factor (priv->left_panel_image) * 256;
+
+  gtk_image_set_from_pixbuf (
+    left_image,
+    gdk_pixbuf_scale_simple (
+      gtk_image_get_pixbuf (left_image),
+      scale,
+      scale,
+      GDK_INTERP_BILINEAR
+    )
+  );
 }
 
 static void
@@ -364,31 +425,9 @@ gis_summary_page_constructed (GObject *object)
   G_OBJECT_CLASS (gis_summary_page_parent_class)->constructed (object);
 
   if (has_switchable_graphics ()) {
-    char *left_desc = _("Use the system menu on the top panel to switch between "
-      "Intel and NVIDIA graphics. Switching will prompt you to restart your "
-      "device.");
-
-    char *right_desc = _("To increase battery life, your Oryx Pro defaults to "
-      "Intel graphics. To use external displays, switch to NVIDIA graphics.");
-
-    gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
-    gtk_label_set_label (GTK_LABEL (priv->left_panel_description), left_desc);
-
-    gtk_label_set_line_wrap (GTK_LABEL (priv->right_panel_description), 1);
-    gtk_label_set_label (GTK_LABEL (priv->right_panel_description), right_desc);
-
-    GtkImage *left_image = GTK_IMAGE (priv->left_panel_image);
-    gint scale = gtk_widget_get_scale_factor (priv->left_panel_image) * 256;
-
-    gtk_image_set_from_pixbuf (
-      left_image,
-      gdk_pixbuf_scale_simple (
-        gtk_image_get_pixbuf (left_image),
-        scale,
-        scale,
-        GDK_INTERP_BILINEAR
-      )
-    );
+    gis_summary_page_set_switchable_title (priv);
+    gis_summary_page_set_switchable_descriptions (priv);
+    gis_summary_page_scale_switchable_images (priv);
   }
 
   update_distro_name (page);
