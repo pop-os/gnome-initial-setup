@@ -356,7 +356,7 @@ has_switchable_graphics ()
   u_int8_t has_switchable = 0;
 
   if (product_version) {
-    has_switchable = strstr (product_version, "oryp2") != NULL;
+    has_switchable = strstr (product_version, "oryp4") != NULL;
     free (product_version);
   }
 
