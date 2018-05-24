@@ -365,11 +365,11 @@ gis_summary_page_constructed (GObject *object)
 
   if (has_switchable_graphics ()) {
     char *left_desc = _("Use the system menu on the top panel to switch between "
-      "Intel and NVIDIA graphics.  Switching will prompt you to restart your "
+      "Intel and NVIDIA graphics. Switching will prompt you to restart your "
       "device.");
 
     char *right_desc = _("To increase battery life, your Oryx Pro defaults to "
-      "Intel graphics.  To use external displays, switch to NVIDIA graphics.");
+      "Intel graphics. To use external displays, switch to NVIDIA graphics.");
 
     gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
     gtk_label_set_label (GTK_LABEL (priv->left_panel_description), left_desc);
