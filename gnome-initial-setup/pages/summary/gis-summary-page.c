@@ -356,7 +356,7 @@ has_switchable_graphics ()
   u_int8_t has_switchable = 0;
 
   if (product_version) {
-    has_switchable = strstr (product_version, "oryp4") != NULL;
+    has_switchable = strstr (product_version, "oryp2") != NULL;
     free (product_version);
   }
 
@@ -369,11 +369,30 @@ get_product_name ()
   return freadln ("/sys/class/dmi/id/product_name");
 }
 
+static char *
+trim (char *str)
+{
+  char *end;
+
+  while (isspace ((unsigned char)*str)) str++;
+
+  if (*str == 0)
+    return str;
+
+  end = str + strlen (str) - 1;
+  while(end > str && isspace ((unsigned char)*end)) end--;
+
+  *(end+1) = 0;
+
+  return str;
+}
+
 static void
-gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv) {
+gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv)
+{
     char *product_name = freadln ("/sys/class/dmi/id/product_name");
     if (product_name) {
-      char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), product_name);
+      char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), trim (product_name));
       gtk_label_set_label (GTK_LABEL (priv->summary_title), title_string);
       g_free (title_string);
       free (product_name);
