@@ -392,7 +392,7 @@ get_product_name ()
 static void
 gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv, char *product_name)
 {
-  char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), trim (product_name));
+  char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), product_name);
   gtk_label_set_label (GTK_LABEL (priv->summary_title), title_string);
   g_free (title_string);
 }
