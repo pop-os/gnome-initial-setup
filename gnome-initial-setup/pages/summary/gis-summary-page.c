@@ -40,9 +40,15 @@
 #define SERVICE_NAME "gdm-password"
 
 struct _GisSummaryPagePrivate {
+  GtkWidget *summary_title;
   GtkWidget *start_button;
   GtkWidget *start_button_label;
   GtkWidget *tagline;
+  GtkWidget *left_panel_label;
+  GtkWidget *left_panel_image;
+  GtkWidget *left_panel_description;
+  GtkWidget *right_panel_label;
+  GtkWidget *right_panel_description;
 
   ActUser *user_account;
   const gchar *user_password;
@@ -336,6 +342,29 @@ gis_summary_page_constructed (GObject *object)
 
   G_OBJECT_CLASS (gis_summary_page_parent_class)->constructed (object);
 
+  char *left_desc = _("Use the system menu on the top panel to switch between "
+    "Intel and NVIDIA graphics.  Switching will prompt you to restart your "
+    "device.");
+
+  char *right_desc = _("To increase battery life, your Oryx Pro defaults to "
+    "Intel graphics.  To use external displays, switch to NVIDIA graphics.");
+
+  gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
+  gtk_label_set_label (GTK_LABEL (priv->left_panel_description), left_desc);
+
+  gtk_label_set_line_wrap (GTK_LABEL (priv->right_panel_description), 1);
+  gtk_label_set_label (GTK_LABEL (priv->right_panel_description), right_desc);
+
+  gtk_image_set_from_pixbuf (
+      GTK_IMAGE (priv->left_panel_image),
+      gdk_pixbuf_scale_simple (
+          gtk_image_get_pixbuf (GTK_IMAGE (priv->left_panel_image)),
+          256,
+          256,
+          GDK_INTERP_BILINEAR
+      )
+  );
+
   update_distro_name (page);
   g_signal_connect (priv->start_button, "clicked", G_CALLBACK (done_cb), page);
 
@@ -357,11 +386,18 @@ gis_summary_page_class_init (GisSummaryPageClass *klass)
   GisPageClass *page_class = GIS_PAGE_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), "/org/gnome/initial-setup/gis-summary-page.ui");
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), "/org/gnome/initial-setup/gis-summary-page-oryx-switchable.ui");
 
+  // gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, tagline);
+
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, summary_title);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, start_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, start_button_label);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, tagline);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_label);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_image);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_description);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_label);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_description);
 
   page_class->page_id = PAGE_ID;
   page_class->locale_changed = gis_summary_page_locale_changed;
