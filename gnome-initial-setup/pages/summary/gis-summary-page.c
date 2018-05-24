@@ -390,34 +390,31 @@ get_product_name ()
 }
 
 static void
-gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv)
+gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv, char *product_name)
 {
-    char *product_name = freadln ("/sys/class/dmi/id/product_name");
-    if (product_name) {
-      char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), trim (product_name));
-      gtk_label_set_label (GTK_LABEL (priv->summary_title), title_string);
-      g_free (title_string);
-      free (product_name);
-    } else {
-      gtk_label_set_label (GTK_LABEL (priv->summary_title), _("Your System Has Switchable Graphics!"));
-    }
+  char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), trim (product_name));
+  gtk_label_set_label (GTK_LABEL (priv->summary_title), title_string);
+  g_free (title_string);
 }
 
 static void
-gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv)
+gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char *product_name)
 {
   char *left_desc = _("Use the system menu on the top panel to switch between "
     "Intel and NVIDIA graphics. Switching will prompt you to restart your "
     "device.");
 
-  char *right_desc = _("To increase battery life, your Oryx Pro defaults to "
-    "Intel graphics. To use external displays, switch to NVIDIA graphics.");
+  char *right_desc = g_strdup_printf (_("To increase battery life, your %s "
+    "defaults to Intel graphics. To use external displays, switch to NVIDIA "
+    "graphics."), product_name);
 
   gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
   gtk_label_set_label (GTK_LABEL (priv->left_panel_description), left_desc);
 
   gtk_label_set_line_wrap (GTK_LABEL (priv->right_panel_description), 1);
   gtk_label_set_label (GTK_LABEL (priv->right_panel_description), right_desc);
+
+  g_free (right_desc);
 }
 
 static void
@@ -446,8 +443,18 @@ gis_summary_page_constructed (GObject *object)
   G_OBJECT_CLASS (gis_summary_page_parent_class)->constructed (object);
 
   if (has_switchable_graphics ()) {
-    gis_summary_page_set_switchable_title (priv);
-    gis_summary_page_set_switchable_descriptions (priv);
+    char *product_name = get_product_name ();
+    if (product_name) {
+        char *trimmed = trim (product_name);
+        gis_summary_page_set_switchable_title (priv, trimmed);
+        gis_summary_page_set_switchable_descriptions (priv, trimmed);
+        free (product_name);
+    } else {
+        product_name = _("System");
+        gis_summary_page_set_switchable_title (priv, product_name);
+        gis_summary_page_set_switchable_descriptions (priv, product_name);
+    }
+
     gis_summary_page_scale_switchable_images (priv);
   }
 
