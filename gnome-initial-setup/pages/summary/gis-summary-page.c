@@ -349,27 +349,7 @@ freadln (char* path)
   return line;
 }
 
-static u_int8_t
-has_switchable_graphics ()
-{
-  char *product_version = freadln ("/sys/class/dmi/id/product_version");
-  u_int8_t has_switchable = 0;
-
-  if (product_version) {
-    has_switchable = strstr (product_version, "oryp4") != NULL;
-    free (product_version);
-  }
-
-  return has_switchable;
-}
-
 static char*
-get_product_name ()
-{
-  return freadln ("/sys/class/dmi/id/product_name");
-}
-
-static char *
 trim (char *str)
 {
   char *end;
@@ -385,6 +365,28 @@ trim (char *str)
   *(end+1) = 0;
 
   return str;
+}
+
+static u_int8_t
+has_switchable_graphics ()
+{
+  char *product_version = freadln ("/sys/class/dmi/id/product_version");
+  u_int8_t has_switchable = 0;
+
+  if (product_version) {
+    const char* trimmed = trim (product_version);
+    has_switchable = strcmp (trimmed, "oryp4") == 0
+      || strcmp (trimmed, "oryp4-b") == 0;
+    free (product_version);
+  }
+
+  return has_switchable;
+}
+
+static char*
+get_product_name ()
+{
+  return freadln ("/sys/class/dmi/id/product_name");
 }
 
 static void
