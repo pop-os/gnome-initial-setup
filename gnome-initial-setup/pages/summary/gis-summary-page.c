@@ -40,9 +40,15 @@
 #define SERVICE_NAME "gdm-password"
 
 struct _GisSummaryPagePrivate {
+  GtkWidget *summary_title;
   GtkWidget *start_button;
   GtkWidget *start_button_label;
   GtkWidget *tagline;
+  GtkWidget *left_panel_label;
+  GtkWidget *left_panel_image;
+  GtkWidget *left_panel_description;
+  GtkWidget *right_panel_label;
+  GtkWidget *right_panel_description;
 
   ActUser *user_account;
   const gchar *user_password;
@@ -328,6 +334,106 @@ update_distro_name (GisSummaryPage *page)
   g_string_free (name, TRUE);
 }
 
+static char*
+freadln (char* path)
+{
+  FILE *product = fopen (path, "r");
+  if (product == NULL) {
+      return NULL;
+  }
+
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read = getline (&line, &len, product);
+  fclose (product);
+  return line;
+}
+
+static char*
+trim (char *str)
+{
+  char *end;
+
+  while (isspace ((unsigned char)*str)) str++;
+
+  if (*str == 0)
+    return str;
+
+  end = str + strlen (str) - 1;
+  while(end > str && isspace ((unsigned char)*end)) end--;
+
+  *(end+1) = 0;
+
+  return str;
+}
+
+static u_int8_t
+has_switchable_graphics ()
+{
+  char *product_version = freadln ("/sys/class/dmi/id/product_version");
+  u_int8_t has_switchable = 0;
+
+  if (product_version) {
+    const char* trimmed = trim (product_version);
+    has_switchable = strcmp (trimmed, "oryp4") == 0
+      || strcmp (trimmed, "oryp4-b") == 0;
+    free (product_version);
+  }
+
+  return has_switchable;
+}
+
+static char*
+get_product_name ()
+{
+  return freadln ("/sys/class/dmi/id/product_name");
+}
+
+static void
+gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv, char *product_name)
+{
+  char *title_string = g_strdup_printf (_("Your %s Has Switchable Graphics!"), product_name);
+  gtk_label_set_label (GTK_LABEL (priv->summary_title), title_string);
+  g_free (title_string);
+}
+
+static void
+gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char *product_name)
+{
+  char *left_desc = _("Use the system menu on the top panel to switch between "
+    "Intel and NVIDIA graphics. Switching will prompt you to restart your "
+    "device.");
+
+  char *right_desc = g_strdup_printf (_("To increase battery life, your %s "
+    "defaults to Intel graphics. To use external displays, switch to NVIDIA "
+    "graphics."), product_name);
+
+  gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
+  gtk_label_set_label (GTK_LABEL (priv->left_panel_description), left_desc);
+
+  gtk_label_set_line_wrap (GTK_LABEL (priv->right_panel_description), 1);
+  gtk_label_set_label (GTK_LABEL (priv->right_panel_description), right_desc);
+
+  g_free (right_desc);
+}
+
+static void
+gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv)
+{
+  GtkImage *left_image = GTK_IMAGE (priv->left_panel_image);
+  gint scale = gtk_widget_get_scale_factor (priv->left_panel_image) * 256;
+
+  gtk_image_set_from_pixbuf (
+    left_image,
+    gdk_pixbuf_scale_simple (
+      gtk_image_get_pixbuf (left_image),
+      scale,
+      scale,
+      GDK_INTERP_BILINEAR
+    )
+  );
+}
+
 static void
 gis_summary_page_constructed (GObject *object)
 {
@@ -335,6 +441,22 @@ gis_summary_page_constructed (GObject *object)
   GisSummaryPagePrivate *priv = gis_summary_page_get_instance_private (page);
 
   G_OBJECT_CLASS (gis_summary_page_parent_class)->constructed (object);
+
+  if (has_switchable_graphics ()) {
+    char *product_name = get_product_name ();
+    if (product_name) {
+        char *trimmed = trim (product_name);
+        gis_summary_page_set_switchable_title (priv, trimmed);
+        gis_summary_page_set_switchable_descriptions (priv, trimmed);
+        free (product_name);
+    } else {
+        product_name = _("System");
+        gis_summary_page_set_switchable_title (priv, product_name);
+        gis_summary_page_set_switchable_descriptions (priv, product_name);
+    }
+
+    gis_summary_page_scale_switchable_images (priv);
+  }
 
   update_distro_name (page);
   g_signal_connect (priv->start_button, "clicked", G_CALLBACK (done_cb), page);
@@ -357,11 +479,30 @@ gis_summary_page_class_init (GisSummaryPageClass *klass)
   GisPageClass *page_class = GIS_PAGE_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), "/org/gnome/initial-setup/gis-summary-page.ui");
+  u_int8_t has_switchable = has_switchable_graphics ();
+
+  char *ui = NULL;
+  if (has_switchable) {
+    ui = "/org/gnome/initial-setup/gis-summary-page-oryx-switchable.ui";
+  } else {
+    ui = "/org/gnome/initial-setup/gis-summary-page.ui";
+  }
+
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), ui);
+
+  if (has_switchable) {
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, summary_title);
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_label);
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_image);
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_description);
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_label);
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_description);
+  } else {
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, tagline);
+  }
 
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, start_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, start_button_label);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, tagline);
 
   page_class->page_id = PAGE_ID;
   page_class->locale_changed = gis_summary_page_locale_changed;
