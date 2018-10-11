@@ -215,25 +215,42 @@ static void
 update_distro_name (GisSummaryPage *page)
 {
   GisSummaryPagePrivate *priv = gis_summary_page_get_instance_private (page);
-  g_autofree char *name = g_get_os_info (G_OS_INFO_KEY_NAME);
+  g_autofree char *name_c = g_get_os_info (G_OS_INFO_KEY_NAME);
+  GString *name;
+  gssize name_i;
+  gsize name_len;
   char *text;
 
-  if (!name)
-    name = g_strdup ("GNOME 3");
+  if (!name_c)
+    name_c = g_strdup ("GNOME 3");
+
+  // Copy to a gstring for escaping functions below
+  name = g_string_new(name_c);
+
+  // Escape underscores to allow distributions names to contain underscore
+  name_len = strlen(name->str);
+  for(name_i = 0; name_i < name_len; name_i++) {
+      if (name->str[name_i] == '_') {
+          g_string_insert(name, name_i, "_");
+          name_i++;
+      }
+  }
 
   /* Translators: the parameter here is the name of a distribution,
    * like "Fedora" or "Ubuntu". It falls back to "GNOME 3" if we can't
    * detect any distribution. */
-  text = g_strdup_printf (_("_Start Using %s"), name);
+  text = g_strdup_printf (_("_Start Using %s"), name->str);
   gtk_label_set_label (GTK_LABEL (priv->start_button_label), text);
   g_free (text);
 
   /* Translators: the parameter here is the name of a distribution,
    * like "Fedora" or "Ubuntu". It falls back to "GNOME 3" if we can't
    * detect any distribution. */
-  text = g_strdup_printf (_("%s is ready to be used. We hope that you love it!"), name);
+  text = g_strdup_printf (_("%s is ready to be used. We hope that you love it!"), name_c);
   gtk_label_set_label (GTK_LABEL (priv->tagline), text);
   g_free (text);
+
+  g_string_free (name, TRUE);
 }
 
 static void
