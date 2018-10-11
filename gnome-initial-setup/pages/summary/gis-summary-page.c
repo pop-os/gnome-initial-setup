@@ -284,24 +284,40 @@ update_distro_name (GisSummaryPage *page)
 {
   GisSummaryPagePrivate *priv = gis_summary_page_get_instance_private (page);
   char *buffer;
-  char *name;
+  char *name_c;
+  GString *name;
+  gssize name_i;
+  gsize name_len;
   char *text;
 
-  name = NULL;
+  name_c = NULL;
 
   if (g_file_get_contents ("/etc/os-release", &buffer, NULL, NULL))
     {
-      name = get_item (buffer, "NAME");
+      name_c = get_item (buffer, "NAME");
       g_free (buffer);
     }
 
-  if (!name)
-    name = g_strdup ("GNOME 3");
+  if (!name_c)
+    name_c = g_strdup ("GNOME 3");
+
+  // Copy to a gstring for escaping functions below
+  name = g_string_new(name_c);
+  g_free(name_c);
+
+  // Escape underscores to allow distributions names to contain underscore
+  name_len = strlen(name->str);
+  for(name_i = 0; name_i < name_len; name_i++) {
+      if (name->str[name_i] == '_') {
+          g_string_insert(name, name_i, "_");
+          name_i++;
+      }
+  }
 
   /* Translators: the parameter here is the name of a distribution,
    * like "Fedora" or "Ubuntu". It falls back to "GNOME 3" if we can't
    * detect any distribution. */
-  text = g_strdup_printf (_("_Start Using %s"), name);
+  text = g_strdup_printf (_("_Start Using %s"), name->str);
   gtk_label_set_label (GTK_LABEL (priv->start_button_label), text);
   g_free (text);
 
@@ -309,7 +325,7 @@ update_distro_name (GisSummaryPage *page)
    * like "Fedora" or "Ubuntu". It falls back to "GNOME 3" if we can't
    * detect any distribution. */
 
-  g_free (name);
+  g_string_free (name, TRUE);
 }
 
 static void
