@@ -215,10 +215,10 @@ add_access_point (GisNetworkPage *page, NMAccessPoint *ap, NMAccessPoint *active
       case NM_DEVICE_STATE_CONFIG:
       case NM_DEVICE_STATE_NEED_AUTH:
       case NM_DEVICE_STATE_IP_CONFIG:
-      case NM_DEVICE_STATE_SECONDARIES:
         activated = FALSE;
         activating = TRUE;
         break;
+      case NM_DEVICE_STATE_SECONDARIES:
       case NM_DEVICE_STATE_ACTIVATED:
         activated = TRUE;
         activating = FALSE;
