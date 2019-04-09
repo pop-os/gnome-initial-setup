@@ -241,14 +241,7 @@ update_distro_logo (GisLanguagePage *page)
       g_free (buffer);
     }
 
-  for (i = 0; i < G_N_ELEMENTS (id_to_logo); i++)
-    {
-      if (g_strcmp0 (id, id_to_logo[i].id) == 0)
-        {
-          g_object_set (priv->logo, "icon-name", id_to_logo[i].logo, NULL);
-          break;
-        }
-    }
+  g_object_set (priv->logo, "icon-name", "distributor-logo", NULL);
 
   g_free (id);
 }
