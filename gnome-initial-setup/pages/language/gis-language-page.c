@@ -231,18 +231,7 @@ update_distro_logo (GisLanguagePage *page)
       g_free (buffer);
     }
 
-  if (g_strcmp0 (id, "debian") == 0)
-    {
-      g_object_set (priv->logo, "icon-name", "emblem-debian", NULL);
-    }
-  else if (g_strcmp0 (id, "fedora") == 0)
-    {
-      g_object_set (priv->logo, "icon-name", "fedora-logo-icon", NULL);
-    }
-  else if (g_strcmp0 (id, "ubuntu") == 0)
-    {
-      g_object_set (priv->logo, "icon-name", "ubuntu-logo-icon", NULL);
-    }
+  g_object_set (priv->logo, "icon-name", "distributor-logo", NULL);
 
   g_free (id);
 }
