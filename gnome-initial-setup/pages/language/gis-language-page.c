@@ -192,6 +192,7 @@ update_distro_logo (GisLanguagePage *page)
   } id_to_logo[] = {
     { "debian",                         "emblem-debian" },
     { "fedora",                         "fedora-logo-icon" },
+    { "pop",                            "pop-os-logo-icon" },
     { "ubuntu",                         "ubuntu-logo-icon" },
     { "openSUSE Tumbleweed",            "opensuse-logo-icon" },
     { "openSUSE Leap",                  "opensuse-logo-icon" },
