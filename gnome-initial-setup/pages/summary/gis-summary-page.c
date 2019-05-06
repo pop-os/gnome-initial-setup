@@ -342,9 +342,11 @@ has_switchable_graphics ()
 
   if (product_version) {
     const char* trimmed = trim (product_version);
-    has_switchable = strcmp (trimmed, "oryp4") == 0
-      || strcmp (trimmed, "oryp4-b") == 0
-      || strcmp (trimmed, "oryp5") == 0;
+    has_switchable =
+        strcmp (trimmed, "gaze14") == 0 ||
+        strcmp (trimmed, "oryp4") == 0 ||
+        strcmp (trimmed, "oryp4-b") == 0 ||
+        strcmp (trimmed, "oryp5") == 0;
     free (product_version);
   }
 
