@@ -65,6 +65,12 @@ move_file_from_homedir (GFile       *src_base,
   }
 }
 
+static void reboot () {
+  gchar *arguments[] = { "systemctl", "reboot", NULL };
+  GSubprocess *child = g_subprocess_newv (arguments, G_SUBPROCESS_FLAGS_NONE, NULL);
+  g_subprocess_wait (child, NULL, NULL);
+}
+
 int
 main (int    argc,
       char **argv)
@@ -93,6 +99,8 @@ main (int    argc,
   FILE (".config/goa-1.0/accounts.conf");
   FILE (".config/monitors.xml");
   FILE (".local/share/keyrings/login.keyring");
+
+  reboot ();
 
   return EXIT_SUCCESS;
 }
