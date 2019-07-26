@@ -425,7 +425,7 @@ static void
 gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv)
 {
   GtkImage *left_image = GTK_IMAGE (priv->left_panel_image);
-  gint scale = gtk_widget_get_scale_factor (priv->left_panel_image) * 256;
+  gint scale = 256;
 
   gtk_image_set_from_pixbuf (
     left_image,
