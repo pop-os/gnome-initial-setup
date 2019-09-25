@@ -1,0 +1,5 @@
+pop-gnome-initial-setup (3.34.0) eoan; urgency=medium
+
+  * Initial release for 3.34.0
+
+ -- Michael Aaron Murphy <michael@system76.com>  Wed, 25 Sep 2019 09:47:03 -0600
