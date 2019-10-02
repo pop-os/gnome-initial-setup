@@ -26,6 +26,7 @@ Build-Depends: debhelper-compat (= 12),
                libpackagekit-glib2-dev (>= 1.1.4),
                libpango1.0-dev (>= 1.32.5),
                libpolkit-gobject-1-dev (>= 0.103),
+               libpop-theme-switcher-dev,
                libpwquality-dev,
                librest-dev,
                libsecret-1-dev,
@@ -46,6 +47,7 @@ Homepage: https://git.gnome.org/browse/gnome-initial-setup/
 Package: pop-gnome-initial-setup
 Architecture: linux-any
 Depends: ${shlibs:Depends},
+         libpop-theme-switcher,
          policykit-1 (>= 0.103),
          adduser,
          gnome-settings-daemon (>= 3.24),

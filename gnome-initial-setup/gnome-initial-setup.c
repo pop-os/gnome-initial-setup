@@ -32,6 +32,7 @@
 #include <cheese-gtk.h>
 #endif
 
+#include "pages/appearance/gis-appearance-page.h"
 #include "pages/language/gis-language-page.h"
 #include "pages/region/gis-region-page.h"
 #include "pages/keyboard/gis-keyboard-page.h"
@@ -69,6 +70,7 @@ static PageData page_table[] = {
 #ifdef ENABLE_REGION_PAGE
   PAGE (region,   FALSE),
 #endif /* ENABLE_REGION_PAGE */
+  PAGE (appearance, FALSE),
   PAGE (keyboard, FALSE),
   PAGE (eula,     FALSE),
   PAGE (network,  FALSE),
