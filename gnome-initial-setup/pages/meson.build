@@ -1,5 +1,6 @@
 pages = [
    'account',
+   'appearance',
    'language',
    'keyboard',
    'network',

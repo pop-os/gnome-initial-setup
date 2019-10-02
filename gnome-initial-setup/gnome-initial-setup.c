@@ -32,6 +32,7 @@
 #include <cheese-gtk.h>
 #endif
 
+#include "pages/appearance/gis-appearance-page.h"
 #include "pages/language/gis-language-page.h"
 #include "pages/keyboard/gis-keyboard-page.h"
 #include "pages/network/gis-network-page.h"
@@ -65,6 +66,7 @@ typedef struct {
 static PageData page_table[] = {
   PAGE (language, FALSE),
   PAGE (keyboard, FALSE),
+  PAGE (appearance, FALSE),
   PAGE (network,  FALSE),
   PAGE (privacy,  FALSE),
   PAGE (timezone, TRUE),
