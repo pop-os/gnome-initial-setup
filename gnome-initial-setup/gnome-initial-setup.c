@@ -70,8 +70,8 @@ static PageData page_table[] = {
 #ifdef ENABLE_REGION_PAGE
   PAGE (region,   FALSE),
 #endif /* ENABLE_REGION_PAGE */
-  PAGE (appearance, FALSE),
   PAGE (keyboard, FALSE),
+  PAGE (appearance, FALSE),
   PAGE (eula,     FALSE),
   PAGE (network,  FALSE),
   PAGE (privacy,  FALSE),
