@@ -5,5 +5,5 @@
                "center": [],
                "right": ["a11y", "keyboard", "aggregateMenu"]
     },
-    "stylesheetName": "gdm3.css"
+    "stylesheetName": "pop.css"
 }
