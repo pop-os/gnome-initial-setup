@@ -46,6 +46,7 @@ static void gis_appearance_page_constructed (GObject *object) {
     priv->switcher = pop_theme_switcher_new ();
 
     GtkWidget *widget = pop_theme_switcher_widget (priv->switcher);
+    gtk_widget_set_valign (widget, GTK_ALIGN_START);
     gtk_container_set_border_width (GTK_CONTAINER (widget), 12);
 
     GtkContainer *container = GTK_CONTAINER (page);
