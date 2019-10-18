@@ -71,7 +71,7 @@ static PageData page_table[] = {
   PAGE (region,   FALSE),
 #endif /* ENABLE_REGION_PAGE */
   PAGE (keyboard, FALSE),
-  PAGE (appearance, FALSE),
+  //PAGE (appearance, FALSE),
   PAGE (eula,     FALSE),
   PAGE (network,  FALSE),
   PAGE (privacy,  FALSE),
