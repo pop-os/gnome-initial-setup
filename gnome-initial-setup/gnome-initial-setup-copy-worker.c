@@ -54,6 +54,10 @@ move_file_from_homedir (GFile       *src_base,
 
   g_file_make_directory_with_parents (dest_parent, NULL, NULL);
 
+  g_warn ("Moving %s to %s",
+         g_file_get_path (src),
+         g_file_get_path (dest)
+  );
   if (!g_file_move (src, dest, G_FILE_COPY_OVERWRITE,
                     NULL, NULL, NULL, &error)) {
     if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND)) {
