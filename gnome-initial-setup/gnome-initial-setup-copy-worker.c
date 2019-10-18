@@ -54,7 +54,7 @@ move_file_from_homedir (GFile       *src_base,
 
   g_file_make_directory_with_parents (dest_parent, NULL, NULL);
 
-  g_warn ("Moving %s to %s",
+  g_message ("Moving %s to %s",
          g_file_get_path (src),
          g_file_get_path (dest)
   );
