@@ -10,6 +10,11 @@ if ! getent passwd gnome-initial-setup >/dev/null; then
             gnome-initial-setup
 fi
 
+# remove old files in /etc/xdg/autostart
+rm -f /etc/xdg/autostart/gnome-initial-setup-copy-worker.desktop
+rm -f /etc/xdg/autostart/gnome-initial-setup-first-login.desktop
+rm -f /etc/xdg/autostart/gnome-welcome-tour.desktop
+
 #DEBHELPER#
 
 exit 0

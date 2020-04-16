@@ -1,8 +1,12 @@
-autostart_files = [
-    'gnome-initial-setup-copy-worker.desktop',
-    'gnome-initial-setup-first-login.desktop',
-    'gnome-welcome-tour.desktop'
-]
+if enable_systemd
+    autostart_files = []
+else
+    autostart_files = [
+        'gnome-initial-setup-copy-worker.desktop',
+        'gnome-initial-setup-first-login.desktop',
+        'gnome-welcome-tour.desktop'
+    ]
+endif
 
 desktop_conf = configuration_data()
 desktop_conf.set('LIBEXECDIR', libexec_dir)
