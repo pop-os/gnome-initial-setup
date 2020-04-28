@@ -330,11 +330,11 @@ static void
 gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char *product_name)
 {
   char *left_desc = _("Use the system menu on the top panel to switch between "
-    "Intel and NVIDIA graphics. Switching will prompt you to restart your "
-    "device.");
+    "Integrated, NVIDIA, and Hybrid Graphics. Switching will prompt you to "
+    "restart your device.");
 
   char *right_desc = g_strdup_printf (_("To increase battery life, your %s "
-    "defaults to Intel graphics. To use external displays, switch to NVIDIA "
+    "defaults to Integrated graphics. To use external displays, switch to NVIDIA "
     "graphics."), product_name);
 
   gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
