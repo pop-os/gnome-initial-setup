@@ -302,7 +302,9 @@ has_switchable_graphics ()
     const char* trimmed = trim (product_version);
     has_switchable =
         strcmp (trimmed, "addw1") == 0 ||
+        strcmp (trimmed, "addw2") == 0 ||
         strcmp (trimmed, "gaze14") == 0 ||
+        strcmp (trimmed, "gaze15") == 0 ||
         strcmp (trimmed, "oryp4") == 0 ||
         strcmp (trimmed, "oryp4-b") == 0 ||
         strcmp (trimmed, "oryp5") == 0;
