@@ -307,7 +307,8 @@ has_switchable_graphics ()
         strcmp (trimmed, "gaze15") == 0 ||
         strcmp (trimmed, "oryp4") == 0 ||
         strcmp (trimmed, "oryp4-b") == 0 ||
-        strcmp (trimmed, "oryp5") == 0;
+        strcmp (trimmed, "oryp5") == 0 ||
+        strcmp (trimmed, "oryp6") == 0;
     free (product_version);
   }
 
