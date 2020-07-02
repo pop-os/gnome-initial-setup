@@ -293,10 +293,22 @@ trim (char *str)
   return str;
 }
 
+static char*
+get_product_name ()
+{
+  return freadln ("/sys/class/dmi/id/product_name");
+}
+
+static char*
+get_product_version ()
+{
+  return freadln ("/sys/class/dmi/id/product_version");
+}
+
 static u_int8_t
 has_switchable_graphics ()
 {
-  char *product_version = freadln ("/sys/class/dmi/id/product_version");
+  char *product_version = get_product_version();
   u_int8_t has_switchable = 0;
 
   if (product_version) {
@@ -316,12 +328,6 @@ has_switchable_graphics ()
   return has_switchable;
 }
 
-static char*
-get_product_name ()
-{
-  return freadln ("/sys/class/dmi/id/product_name");
-}
-
 static void
 gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv, char *product_name)
 {
@@ -331,7 +337,7 @@ gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv, char *produc
 }
 
 static void
-gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char *product_name)
+gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char *product_name, char *product_version)
 {
   char *left_desc = _("Use the system menu on the top panel to switch between "
     "Integrated, NVIDIA, and Hybrid Graphics. Switching will prompt you to "
@@ -339,8 +345,8 @@ gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char 
 
   // oryp4 does not have a Turing card, so it defaults to integrated
   char *right_desc;
-  if (strcmp (product_name, "oryp4") == 0 ||
-      strcmp (product_name, "oryp4-b") == 0) {
+  if (strcmp (product_version, "oryp4") == 0 ||
+      strcmp (product_version, "oryp4-b") == 0) {
     gtk_label_set_label (GTK_LABEL (priv->right_panel_label), _("Using External Displays"));
 
     right_desc = g_strdup_printf (_("To increase battery life, your %s "
@@ -362,7 +368,7 @@ gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char 
 }
 
 static void
-gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv, char *product_name)
+gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv, char *product_version)
 {
   GtkImage *left_image = GTK_IMAGE (priv->left_panel_image);
   gint scale_w = 250;
@@ -379,8 +385,8 @@ gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv, char *pro
   );
 
   GtkImage *right_image = GTK_IMAGE (priv->right_panel_image);
-  if (strcmp (product_name, "oryp4") == 0 ||
-      strcmp (product_name, "oryp4-b") == 0) {
+  if (strcmp (product_version, "oryp4") == 0 ||
+      strcmp (product_version, "oryp4-b") == 0) {
     gtk_image_set_from_icon_name (right_image, "video-display", GTK_ICON_SIZE_DIALOG);
     gtk_image_set_pixel_size (right_image, 256);
   } else {
@@ -406,19 +412,23 @@ gis_summary_page_constructed (GObject *object)
   G_OBJECT_CLASS (gis_summary_page_parent_class)->constructed (object);
 
   if (has_switchable_graphics ()) {
+    char *product_version = get_product_version ();
+    char *version = trim(product_version);
+
     char *product_name = get_product_name ();
     if (product_name) {
         char *trimmed = trim (product_name);
         gis_summary_page_set_switchable_title (priv, trimmed);
-        gis_summary_page_set_switchable_descriptions (priv, trimmed);
+        gis_summary_page_set_switchable_descriptions (priv, trimmed, version);
         free (product_name);
     } else {
         product_name = _("System");
         gis_summary_page_set_switchable_title (priv, product_name);
-        gis_summary_page_set_switchable_descriptions (priv, product_name);
+        gis_summary_page_set_switchable_descriptions (priv, product_name, version);
     }
 
-    gis_summary_page_scale_switchable_images (priv, product_name);
+    gis_summary_page_scale_switchable_images (priv, version);
+    free (product_version);
   }
 
   update_distro_name (page);
