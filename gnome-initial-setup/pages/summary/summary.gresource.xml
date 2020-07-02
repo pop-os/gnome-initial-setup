@@ -5,5 +5,6 @@
     <file preprocess="xml-stripblanks" alias="gis-summary-page-oryx-switchable.ui">gis-summary-page-oryx-switchable.ui</file>
     <file alias="ready-to-go.svg">ready-to-go.svg</file>
     <file alias="switching.png">switching.png</file>
+    <file alias="right-click.png">right-click.png</file>
   </gresource>
 </gresources>

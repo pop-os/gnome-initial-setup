@@ -45,6 +45,7 @@ struct _GisSummaryPagePrivate {
   GtkWidget *left_panel_label;
   GtkWidget *left_panel_image;
   GtkWidget *left_panel_description;
+  GtkWidget *right_panel_image;
   GtkWidget *right_panel_label;
   GtkWidget *right_panel_description;
 
@@ -336,9 +337,20 @@ gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char 
     "Integrated, NVIDIA, and Hybrid Graphics. Switching will prompt you to "
     "restart your device.");
 
-  char *right_desc = g_strdup_printf (_("To increase battery life, your %s "
-    "defaults to Integrated graphics. To use external displays, switch to NVIDIA "
-    "graphics."), product_name);
+  // oryp4 does not have a Turing card, so it defaults to integrated
+  char *right_desc;
+  if (strcmp (product_name, "oryp4") == 0 ||
+      strcmp (product_name, "oryp4-b") == 0) {
+    gtk_label_set_label (GTK_LABEL (priv->right_panel_label), _("Using External Displays"));
+
+    right_desc = g_strdup_printf (_("To increase battery life, your %s "
+      "defaults to Integrated graphics. To use external displays, switch to NVIDIA "
+      "graphics."), product_name);
+  } else {
+    right_desc = g_strdup_printf (_("Your %s defaults to Hybrid graphics. To launch "
+      "an application on the NVIDIA GPU, right click the desktop icon and select "
+      "\"Launch using Dedicated Graphics Card\"."), product_name);
+  }
 
   gtk_label_set_line_wrap (GTK_LABEL (priv->left_panel_description), 1);
   gtk_label_set_label (GTK_LABEL (priv->left_panel_description), left_desc);
@@ -350,7 +362,7 @@ gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char 
 }
 
 static void
-gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv)
+gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv, char *product_name)
 {
   GtkImage *left_image = GTK_IMAGE (priv->left_panel_image);
   gint scale_w = 250;
@@ -365,6 +377,24 @@ gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv)
       GDK_INTERP_BILINEAR
     )
   );
+
+  GtkImage *right_image = GTK_IMAGE (priv->right_panel_image);
+  if (strcmp (product_name, "oryp4") == 0 ||
+      strcmp (product_name, "oryp4-b") == 0) {
+    gtk_image_set_from_icon_name (right_image, "video-display", GTK_ICON_SIZE_DIALOG);
+    gtk_image_set_pixel_size (right_image, 256);
+  } else {
+    gtk_image_set_from_pixbuf (
+      right_image,
+      gdk_pixbuf_scale_simple (
+        gtk_image_get_pixbuf (right_image),
+        425,  // scale_w
+        180,  // scale_h
+        GDK_INTERP_BILINEAR
+      )
+    );
+  }
+
 }
 
 static void
@@ -388,7 +418,7 @@ gis_summary_page_constructed (GObject *object)
         gis_summary_page_set_switchable_descriptions (priv, product_name);
     }
 
-    gis_summary_page_scale_switchable_images (priv);
+    gis_summary_page_scale_switchable_images (priv, product_name);
   }
 
   update_distro_name (page);
@@ -429,6 +459,7 @@ gis_summary_page_class_init (GisSummaryPageClass *klass)
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_image);
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, left_panel_description);
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_label);
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_image);
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_description);
   } else {
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, tagline);
