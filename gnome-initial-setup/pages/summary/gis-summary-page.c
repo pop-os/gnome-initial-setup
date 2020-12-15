@@ -293,6 +293,12 @@ trim (char *str)
   return str;
 }
 
+static gchar *
+get_system_vendor ()
+{
+  return freadln ("/sys/class/dmi/id/sys_vendor");
+}
+
 static char*
 get_product_name ()
 {
@@ -305,27 +311,48 @@ get_product_version ()
   return freadln ("/sys/class/dmi/id/product_version");
 }
 
-static u_int8_t
+static gboolean
 has_switchable_graphics ()
 {
-  char *product_version = get_product_version();
-  u_int8_t has_switchable = 0;
+  g_autoptr (GDBusConnection) connection = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GVariant) variant = NULL;
+  gboolean switchable = FALSE;
+  gchar *vendor = NULL;
+  gboolean is_system76 = FALSE;
 
-  if (product_version) {
-    const char* trimmed = trim (product_version);
-    has_switchable =
-        strcmp (trimmed, "addw1") == 0 ||
-        strcmp (trimmed, "addw2") == 0 ||
-        strcmp (trimmed, "gaze14") == 0 ||
-        strcmp (trimmed, "gaze15") == 0 ||
-        strcmp (trimmed, "oryp4") == 0 ||
-        strcmp (trimmed, "oryp4-b") == 0 ||
-        strcmp (trimmed, "oryp5") == 0 ||
-        strcmp (trimmed, "oryp6") == 0;
-    free (product_version);
+  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
+  if (connection == NULL) {
+    g_warning ("Failed to create DBus connection");
+    return FALSE;
   }
 
-  return has_switchable;
+  variant = g_dbus_connection_call_sync(
+      connection,
+      "com.system76.PowerDaemon",
+      "/com/system76/PowerDaemon",
+      "com.system76.PowerDaemon",
+      "GetSwitchable",
+      NULL,
+      G_VARIANT_TYPE("(b)"),
+      G_DBUS_CALL_FLAGS_NONE,
+      1000,
+      NULL,
+      &error);
+
+  if (variant == NULL) {
+    g_warning ("DBus call failed: %s", error->message);
+    return FALSE;
+  }
+
+  g_variant_get (variant, "(b)", &switchable);
+
+  // Limit showing switchable graphics page to System76 models
+  vendor = get_system_vendor ();
+  is_system76 = strcmp (trim (vendor), "System76") == 0;
+  free (vendor);
+
+  return switchable && is_system76;
 }
 
 static void
@@ -452,7 +479,7 @@ gis_summary_page_class_init (GisSummaryPageClass *klass)
   GisPageClass *page_class = GIS_PAGE_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  u_int8_t has_switchable = has_switchable_graphics ();
+  gboolean has_switchable = has_switchable_graphics ();
 
   char *ui = NULL;
   if (has_switchable) {

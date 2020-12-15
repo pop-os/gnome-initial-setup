@@ -60,6 +60,7 @@ Depends: ${shlibs:Depends},
          ${misc:Depends}
 Recommends: gnome-getting-started-docs,
             gnome-keyring,
+            system76-power,
 Suggests: gdm3
 Description: Initial GNOME system setup helper
  After acquiring or installing a new system there are a few essential things
