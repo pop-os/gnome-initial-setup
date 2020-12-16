@@ -379,6 +379,10 @@ gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char 
     right_desc = g_strdup_printf (_("To increase battery life, your %s "
       "defaults to Integrated graphics. To use external displays, switch to NVIDIA "
       "graphics."), product_name);
+  } else if (strcmp (product_version, "galp5") == 0) {
+    // XXX: distinst defaults to integrated due to NVIDIA bug in hybrid mode
+    right_desc = g_strdup_printf (_("Your %s defaults to Integrated graphics. "
+      "To utilize GPU offloading, switch to Hybrid graphics."), product_name);
   } else {
     right_desc = g_strdup_printf (_("Your %s defaults to Hybrid graphics. To launch "
       "an application on the NVIDIA GPU, right click the desktop icon and select "
