@@ -311,6 +311,43 @@ get_product_version ()
   return freadln ("/sys/class/dmi/id/product_version");
 }
 
+static gchar *
+default_graphics_mode ()
+{
+  g_autoptr (GDBusConnection) connection = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GVariant) variant = NULL;
+  gchar *gfx_mode = NULL;
+
+  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
+  if (connection == NULL) {
+    g_warning ("Failed to create DBus connection");
+    return g_strdup ("nvidia");
+  }
+
+  variant = g_dbus_connection_call_sync(
+      connection,
+      "com.system76.PowerDaemon",
+      "/com/system76/PowerDaemon",
+      "com.system76.PowerDaemon",
+      "GetDefaultGraphics",
+      NULL,
+      G_VARIANT_TYPE("(s)"),
+      G_DBUS_CALL_FLAGS_NONE,
+      1000,
+      NULL,
+      &error);
+
+  if (variant == NULL) {
+    g_warning ("DBus call failed: %s", error->message);
+    return g_strdup ("nvidia");
+  }
+
+  g_variant_get (variant, "(s)", &gfx_mode);
+
+  return gfx_mode;
+}
+
 static gboolean
 has_switchable_graphics ()
 {
