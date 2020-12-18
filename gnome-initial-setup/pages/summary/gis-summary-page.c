@@ -299,16 +299,10 @@ get_system_vendor ()
   return freadln ("/sys/class/dmi/id/sys_vendor");
 }
 
-static char*
+static gchar*
 get_product_name ()
 {
   return freadln ("/sys/class/dmi/id/product_name");
-}
-
-static char*
-get_product_version ()
-{
-  return freadln ("/sys/class/dmi/id/product_version");
 }
 
 static gchar *
@@ -401,25 +395,18 @@ gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv, char *produc
 }
 
 static void
-gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char *product_name, char *product_version)
+gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char *product_name)
 {
-  char *left_desc = _("Use the system menu on the top panel to switch between "
+  gchar *right_desc;
+  gchar *gfx = default_graphics_mode ();
+  gchar *left_desc = _("Use the system menu on the top panel to switch between "
     "Integrated, NVIDIA, and Hybrid Graphics. Switching will prompt you to "
     "restart your device.");
 
-  // oryp4 does not have a Turing card, so it defaults to integrated
-  char *right_desc;
-  if (strcmp (product_version, "oryp4") == 0 ||
-      strcmp (product_version, "oryp4-b") == 0) {
-    gtk_label_set_label (GTK_LABEL (priv->right_panel_label), _("Using External Displays"));
-
-    right_desc = g_strdup_printf (_("To increase battery life, your %s "
-      "defaults to Integrated graphics. To use external displays, switch to NVIDIA "
-      "graphics."), product_name);
-  } else if (strcmp (product_version, "galp5") == 0) {
-    // XXX: distinst defaults to integrated due to NVIDIA bug in hybrid mode
-    right_desc = g_strdup_printf (_("Your %s defaults to Integrated graphics. "
-      "To utilize GPU offloading, switch to Hybrid graphics."), product_name);
+  if (strcmp (gfx, "integrated") == 0) {
+    right_desc = g_strdup_printf (_("Your %s defaults to integrated graphics. "
+      "To utilize GPU offloading, switch to hybrid graphics. To potentially "
+      "use external displays, switch to hybrid or NVIDIA graphics."), product_name);
   } else {
     right_desc = g_strdup_printf (_("Your %s defaults to Hybrid graphics. To launch "
       "an application on the NVIDIA GPU, right click the desktop icon and select "
@@ -433,10 +420,11 @@ gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char 
   gtk_label_set_label (GTK_LABEL (priv->right_panel_description), right_desc);
 
   g_free (right_desc);
+  g_free (gfx);
 }
 
 static void
-gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv, char *product_version)
+gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv)
 {
   GtkImage *left_image = GTK_IMAGE (priv->left_panel_image);
   gint scale_w = 250;
@@ -453,22 +441,15 @@ gis_summary_page_scale_switchable_images (GisSummaryPagePrivate *priv, char *pro
   );
 
   GtkImage *right_image = GTK_IMAGE (priv->right_panel_image);
-  if (strcmp (product_version, "oryp4") == 0 ||
-      strcmp (product_version, "oryp4-b") == 0) {
-    gtk_image_set_from_icon_name (right_image, "video-display", GTK_ICON_SIZE_DIALOG);
-    gtk_image_set_pixel_size (right_image, 256);
-  } else {
-    gtk_image_set_from_pixbuf (
-      right_image,
-      gdk_pixbuf_scale_simple (
-        gtk_image_get_pixbuf (right_image),
-        425,  // scale_w
-        180,  // scale_h
-        GDK_INTERP_BILINEAR
-      )
-    );
-  }
-
+  gtk_image_set_from_pixbuf (
+    right_image,
+    gdk_pixbuf_scale_simple (
+      gtk_image_get_pixbuf (right_image),
+      425,  // scale_w
+      180,  // scale_h
+      GDK_INTERP_BILINEAR
+    )
+  );
 }
 
 static void
@@ -480,23 +461,19 @@ gis_summary_page_constructed (GObject *object)
   G_OBJECT_CLASS (gis_summary_page_parent_class)->constructed (object);
 
   if (has_switchable_graphics ()) {
-    char *product_version = get_product_version ();
-    char *version = trim(product_version);
-
     char *product_name = get_product_name ();
     if (product_name) {
         char *trimmed = trim (product_name);
         gis_summary_page_set_switchable_title (priv, trimmed);
-        gis_summary_page_set_switchable_descriptions (priv, trimmed, version);
+        gis_summary_page_set_switchable_descriptions (priv, trimmed);
         free (product_name);
     } else {
         product_name = _("System");
         gis_summary_page_set_switchable_title (priv, product_name);
-        gis_summary_page_set_switchable_descriptions (priv, product_name, version);
+        gis_summary_page_set_switchable_descriptions (priv, product_name);
     }
 
-    gis_summary_page_scale_switchable_images (priv, version);
-    free (product_version);
+    gis_summary_page_scale_switchable_images (priv);
   }
 
   update_distro_name (page);
