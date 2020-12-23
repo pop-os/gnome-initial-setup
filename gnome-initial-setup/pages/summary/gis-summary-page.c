@@ -386,6 +386,43 @@ has_switchable_graphics ()
   return switchable && is_system76;
 }
 
+static gboolean
+ext_displays_require_dgpu ()
+{
+  g_autoptr (GDBusConnection) connection = NULL;
+  g_autoptr (GError) error = NULL;
+  g_autoptr (GVariant) variant = NULL;
+  gboolean requires_nvidia = FALSE;
+
+  connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
+  if (connection == NULL) {
+    g_warning ("Failed to create DBus connection");
+    return FALSE;
+  }
+
+  variant = g_dbus_connection_call_sync(
+      connection,
+      "com.system76.PowerDaemon",
+      "/com/system76/PowerDaemon",
+      "com.system76.PowerDaemon",
+      "GetExternalDisplaysRequireDGPU",
+      NULL,
+      G_VARIANT_TYPE("(b)"),
+      G_DBUS_CALL_FLAGS_NONE,
+      1000,
+      NULL,
+      &error);
+
+  if (variant == NULL) {
+    g_warning ("DBus call failed: %s", error->message);
+    return FALSE;
+  }
+
+  g_variant_get (variant, "(b)", &requires_nvidia);
+
+  return requires_nvidia;
+}
+
 static void
 gis_summary_page_set_switchable_title (GisSummaryPagePrivate *priv, char *product_name)
 {
@@ -404,9 +441,14 @@ gis_summary_page_set_switchable_descriptions (GisSummaryPagePrivate *priv, char 
     "restart your device.");
 
   if (strcmp (gfx, "integrated") == 0) {
-    right_desc = g_strdup_printf (_("Your %s defaults to integrated graphics. "
-      "To utilize GPU offloading, switch to hybrid graphics. To potentially "
-      "use external displays, switch to hybrid or NVIDIA graphics."), product_name);
+    if (ext_displays_require_dgpu ()) {
+      right_desc = g_strdup_printf (_("To increase battery life, your %s "
+        "defaults to Integrated graphics. To use external displays, switch to "
+        "NVIDIA graphics."), product_name);
+    } else {
+      right_desc = g_strdup_printf (_("Your %s defaults to Integrated graphics. "
+        "To utilize GPU offloading, switch to Hybrid graphics."), product_name);
+    }
   } else {
     right_desc = g_strdup_printf (_("Your %s defaults to Hybrid graphics. To launch "
       "an application on the NVIDIA GPU, right click the desktop icon and select "
