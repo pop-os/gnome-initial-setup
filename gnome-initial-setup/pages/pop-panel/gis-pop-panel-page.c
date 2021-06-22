@@ -10,6 +10,7 @@
 
 #include "gis-page-header.h"
 #include "gis-pop-panel-page.h"
+#include "pop_desktop_widget.h"
 
 struct _GisPopPanelPage {
   GisPage parent_instance;
@@ -55,101 +56,13 @@ static void gis_pop_panel_page_class_init(GisPopPanelPageClass *klass) {
   widget_class->realize = gis_pop_panel_page_realize;
 }
 
-/** Create a row of the settings list box */
-GtkWidget *settings_row(GtkWidget *widget, char *label) {
-  GtkWidget *description = gtk_label_new(label);
-  gtk_widget_set_hexpand(description, TRUE);
-  gtk_label_set_xalign(GTK_LABEL(description), 0.0);
-
-  GtkWidget *container = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
-  gtk_widget_set_margin_start(container, 12);
-  gtk_widget_set_margin_top(container, 6);
-  gtk_widget_set_margin_end(container, 12);
-  gtk_widget_set_margin_bottom(container, 6);
-  gtk_container_add(GTK_CONTAINER(container), description);
-  gtk_container_add(GTK_CONTAINER(container), widget);
-
-  return container;
-}
-
-static void panel_position_changed(GtkComboBox *combo, GSettings *settings) {
-  g_settings_set_boolean(settings, "show-panel", gtk_combo_box_get_active(combo) == 1);
-}
-
-/** Chooses whether the panel should show on all displays, or only the primary */
-GtkWidget *panel_position_row(GSettings *settings) {
-  GtkWidget *combo = gtk_combo_box_text_new();
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), _("Primary Display"));
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), _("All Displays"));
-  gtk_combo_box_set_active(GTK_COMBO_BOX(combo), g_settings_get_boolean(settings, "show-panel") ? 1 : 0);
-  g_signal_connect(GTK_COMBO_BOX(combo), "changed", G_CALLBACK(panel_position_changed), settings);
-
-  return settings_row(combo, _("Show Top Bar on Display"));
-}
-
-static void date_position_changed(GtkComboBox *combo, GSettings *settings) {
-  gint active = gtk_combo_box_get_active(combo);
-  if (active == -1) active = 0;
-
-  g_settings_set_enum(settings, "clock-alignment", active);
-}
-
-/** Controls the positioning of the notification area */
-GtkWidget *date_position_row(GSettings *settings) {
-  GtkWidget *combo = gtk_combo_box_text_new();
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), _("Center"));
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), _("Left"));
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), _("Right"));
-  gtk_combo_box_set_active(GTK_COMBO_BOX(combo), g_settings_get_enum(settings, "clock-alignment"));
-  g_signal_connect(GTK_COMBO_BOX(combo), "changed", G_CALLBACK(date_position_changed), settings);
-
-  return settings_row(combo, _("Date & Time and Notifications Position"));
-}
-
-static void list_header(GtkListBoxRow *row, GtkListBoxRow *before, gpointer data) {
-  if (before != NULL) gtk_list_box_row_set_header(row, gtk_separator_new(GTK_ORIENTATION_HORIZONTAL));
-}
-
 static void gis_pop_panel_page_init(GisPopPanelPage *page) {
   gis_page_set_title(GIS_PAGE(page), _("Pop Panel"));
 
   GisPopPanelPage *priv = gis_pop_panel_page_get_instance_private(page);
   priv->header = g_object_new(GIS_TYPE_PAGE_HEADER, "title", title(), NULL);
 
-  GtkWidget *extra_notice = gtk_label_new(_(
-    "Top bar configuration can be changed at any time from the Settings application."
-  ));
-
-  GSettings *cosmic_settings = g_settings_new("org.gnome.shell.extensions.pop-cosmic");
-  GSettings *multi_monitor_settings = g_settings_new("org.gnome.shell.extensions.multi-monitors-add-on");
-
-  GtkWidget *show_applications_toggle = gtk_switch_new();
-  g_settings_bind(cosmic_settings, "show-applications-button", show_applications_toggle, "active", G_SETTINGS_BIND_DEFAULT);
-
-  GtkWidget *show_workspaces_toggle = gtk_switch_new();
-  g_settings_bind(cosmic_settings, "show-workspaces-button", show_workspaces_toggle, "active", G_SETTINGS_BIND_DEFAULT);
-
-  GtkWidget *settings_box = gtk_list_box_new();
-  gtk_list_box_set_header_func(GTK_LIST_BOX(settings_box), list_header, NULL, NULL);
-
-  gtk_container_add(GTK_CONTAINER(settings_box), settings_row(show_applications_toggle, _("Show Applications Button")));
-  gtk_container_add(GTK_CONTAINER(settings_box), settings_row(show_workspaces_toggle, _("Show Workspaces Button")));
-  gtk_container_add(GTK_CONTAINER(settings_box), panel_position_row(multi_monitor_settings));
-  gtk_container_add(GTK_CONTAINER(settings_box), date_position_row(cosmic_settings));
-
-  GtkWidget *framed_box = gtk_frame_new(NULL);
-  gtk_widget_set_margin_top(framed_box, 32);
-  gtk_widget_set_vexpand(framed_box, TRUE);
-  gtk_widget_set_valign(framed_box, GTK_ALIGN_START);
-  gtk_container_add(GTK_CONTAINER(framed_box), settings_box);
-
-  GtkWidget *container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_widget_set_halign(container, GTK_ALIGN_CENTER);
-  gtk_container_add(GTK_CONTAINER(container), priv->header);
-  gtk_container_add(GTK_CONTAINER(container), framed_box);
-  gtk_container_add(GTK_CONTAINER(container), extra_notice);
-
-  gtk_container_add(GTK_CONTAINER(&priv->parent_instance), container);
+  gtk_container_add(GTK_CONTAINER(&priv->parent_instance), pop_desktop_widget_gis_panel_page(priv->header));
   gtk_widget_show_all(GTK_WIDGET(priv));
   gtk_widget_set_vexpand(GTK_WIDGET(priv), TRUE);
   gtk_widget_set_margin_top(GTK_WIDGET(priv), 48);
