@@ -48,6 +48,8 @@
 #include "pages/pop-launcher/gis-pop-launcher-page.h"
 #include "pages/pop-gesture/gis-pop-gesture-page.h"
 
+#include "pop_desktop_widget.h"
+
 #define VENDOR_PAGES_GROUP "pages"
 #define VENDOR_SKIP_KEY "skip"
 #define VENDOR_NEW_USER_ONLY_KEY "new_user_only"
@@ -274,6 +276,8 @@ main (int argc, char *argv[])
     g_message ("Mock mode: changes will not be saved to disk");
   else
     g_message ("Production mode: changes will be saved to disk");
+
+  pop_desktop_widget_gresource_init ();
 
   skipped_pages = g_ptr_array_new_with_free_func ((GDestroyNotify) gtk_widget_destroy);
   mode = get_mode ();
