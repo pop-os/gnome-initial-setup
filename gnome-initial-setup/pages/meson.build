@@ -1,4 +1,8 @@
 pages = [
+   'pop-dock',
+   'pop-panel',
+   'pop-launcher',
+   'pop-gesture',
    'account',
    'appearance',
    'language',
