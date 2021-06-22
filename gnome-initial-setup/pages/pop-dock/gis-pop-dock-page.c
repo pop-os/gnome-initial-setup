@@ -97,7 +97,16 @@ static void gis_pop_dock_page_init(GisPopDockPage *page) {
   GtkWidget *check_no_extend = gtk_radio_button_new_with_label(NULL, _("Dock doesn't extend to the edges"));
   gtk_radio_button_join_group(GTK_RADIO_BUTTON(check_no_extend), GTK_RADIO_BUTTON(check_extend));
 
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_extend), TRUE);
+  GtkWidget *active_button;
+  if (g_settings_get_boolean(settings, "manualhide")) {
+    active_button = check_no_dock;
+  } else if (g_settings_get_boolean(settings, "extend-height")) {
+    active_button = check_extend;
+  } else {
+    active_button = check_no_extend;
+  }
+
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(active_button), TRUE);
 
   GtkWidget *dock_selector = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
   gtk_widget_set_vexpand(dock_selector, TRUE);
