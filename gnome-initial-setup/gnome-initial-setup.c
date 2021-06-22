@@ -43,6 +43,10 @@
 #include "pages/parental-controls/gis-parental-controls-page.h"
 #include "pages/password/gis-password-page.h"
 #include "pages/summary/gis-summary-page.h"
+#include "pages/pop-dock/gis-pop-dock-page.h"
+#include "pages/pop-panel/gis-pop-panel-page.h"
+#include "pages/pop-launcher/gis-pop-launcher-page.h"
+#include "pages/pop-gesture/gis-pop-gesture-page.h"
 
 #define VENDOR_PAGES_GROUP "pages"
 #define VENDOR_SKIP_KEY "skip"
@@ -66,6 +70,10 @@ typedef struct {
 static PageData page_table[] = {
   PAGE (language, FALSE),
   PAGE (keyboard, FALSE),
+  PAGE (pop_dock, FALSE),
+  PAGE (pop_panel, FALSE),
+  PAGE (pop_launcher, FALSE),
+  PAGE (pop_gesture, FALSE),
 //  PAGE (appearance, FALSE),
   PAGE (network,  FALSE),
   PAGE (privacy,  FALSE),

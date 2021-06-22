@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/initial-setup">
+    <file alias="pop-dock-none.png">pop-dock-none.png</file>
+    <file alias="pop-dock-extends.png">pop-dock-extends.png</file>
+    <file alias="pop-dock-dynamic.png">pop-dock-dynamic.png</file>
+  </gresource>
+</gresources>
