@@ -9,29 +9,32 @@
 #include <gtk/gtk.h>
 
 #include "gis-page-header.h"
-#include "gis-page-header.h"
 #include "gis-pop-dock-page.h"
 #include "pop_desktop_widget.h"
 
 struct _GisPopDockPage {
   GisPage parent_instance;
   GtkWidget *header;
+  char *title;
 };
 
 typedef struct _GisPopDockPage GisPopDockPage;
 
 G_DEFINE_TYPE(GisPopDockPage, gis_pop_dock_page, GIS_TYPE_PAGE)
 
-static char *title() {
-  return _("Welcome to Pop!_OS");
-}
-
 static void gis_pop_dock_page_dispose(GObject *object) {
+  GisPopDockPage *priv = gis_pop_dock_page_get_instance_private(GIS_POP_DOCK_PAGE(object));
+  pop_desktop_widget_string_free (g_steal_pointer (&priv->title));
+
   G_OBJECT_CLASS(gis_pop_dock_page_parent_class)->dispose(object);
 }
 
 static void gis_pop_dock_page_locale_changed(GisPage *gis_page) {
-  gis_page_set_title(gis_page, title());
+  GisPopDockPage *priv = gis_pop_dock_page_get_instance_private(GIS_POP_DOCK_PAGE(gis_page));
+  pop_desktop_widget_localize ();
+  pop_desktop_widget_string_free (g_steal_pointer (&priv->title));
+  priv->title = pop_desktop_widget_gis_dock_title ();
+  gis_page_set_title(gis_page,  priv->title);
 }
 
 static void gis_pop_dock_page_realize(GtkWidget *gis_page) {
@@ -59,9 +62,8 @@ static void gis_pop_dock_page_class_init(GisPopDockPageClass *klass) {
 
 static void gis_pop_dock_page_init(GisPopDockPage *page) {
   GisPopDockPage *priv = gis_pop_dock_page_get_instance_private(page);
-  priv->header = g_object_new(GIS_TYPE_PAGE_HEADER, "title", title(), NULL);
-
-  gis_page_set_title(GIS_PAGE(page), _("Pop Dock"));
+  priv->title = pop_desktop_widget_gis_dock_title();
+  priv->header = g_object_new(GIS_TYPE_PAGE_HEADER, "title",  priv->title, NULL);
 
   gtk_container_add(GTK_CONTAINER(&priv->parent_instance), pop_desktop_widget_gis_dock_page(priv->header));
   gtk_widget_set_vexpand(GTK_WIDGET(priv), TRUE);

@@ -3,6 +3,7 @@ pages = [
    'pop-panel',
    'pop-launcher',
    'pop-gesture',
+   'pop-extensions',
    'account',
    'appearance',
    'language',

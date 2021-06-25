@@ -47,6 +47,7 @@
 #include "pages/pop-panel/gis-pop-panel-page.h"
 #include "pages/pop-launcher/gis-pop-launcher-page.h"
 #include "pages/pop-gesture/gis-pop-gesture-page.h"
+#include "pages/pop-extensions/gis-pop-extensions-page.h"
 
 #include "pop_desktop_widget.h"
 
@@ -77,6 +78,7 @@ static PageData page_table[] = {
   PAGE (pop_panel, FALSE, TRUE),
   PAGE (pop_launcher, FALSE, TRUE),
   PAGE (pop_gesture, FALSE, TRUE),
+  PAGE (pop_extensions, FALSE, TRUE),
 //  PAGE (appearance, FALSE, FALSE),
   PAGE (network,  FALSE, FALSE),
   PAGE (privacy,  FALSE, FALSE),
@@ -247,17 +249,12 @@ gchar *done_path () {
 }
 
 int initial_setup_check () {
-  gchar *path = done_path ();
-  gchar *output = NULL;
+  g_autofree gchar *path = done_path ();
+  g_autofree gchar *output = NULL;
 
   g_file_get_contents (path, &output, NULL, NULL);
 
-  int mode = output == NULL ? 0 : 0 != g_strcmp0(output, "21.04") ? 1 : 2;
-
-  g_free(path);
-  g_free(output);
-
-  return mode;
+  return output == NULL ? 0 : 0 != g_strcmp0(output, "21.04") ? 1 : 2;
 }
 
 int

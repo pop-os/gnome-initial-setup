@@ -9,29 +9,32 @@
 #include <gtk/gtk.h>
 
 #include "gis-page-header.h"
-#include "pop-launcher-resources.h"
-#include "gis-page-header.h"
 #include "gis-pop-launcher-page.h"
+#include "pop_desktop_widget.h"
 
 struct _GisPopLauncherPage {
   GisPage parent_instance;
   GtkWidget *header;
+  char *title;
 };
 
 typedef struct _GisPopLauncherPage GisPopLauncherPage;
 
 G_DEFINE_TYPE(GisPopLauncherPage, gis_pop_launcher_page, GIS_TYPE_PAGE)
 
-static char *title() {
-  return _("Open and Switch Applications from Launcher");
-}
-
 static void gis_pop_launcher_page_dispose(GObject *object) {
+  GisPopLauncherPage *priv = gis_pop_launcher_page_get_instance_private(GIS_POP_LAUNCHER_PAGE(object));
+  pop_desktop_widget_string_free (g_steal_pointer (&priv->title));
+
   G_OBJECT_CLASS(gis_pop_launcher_page_parent_class)->dispose(object);
 }
 
 static void gis_pop_launcher_page_locale_changed(GisPage *gis_page) {
-  gis_page_set_title(gis_page, title());
+  GisPopLauncherPage *priv = gis_pop_launcher_page_get_instance_private(GIS_POP_LAUNCHER_PAGE(gis_page));
+  pop_desktop_widget_localize ();
+  pop_desktop_widget_string_free (g_steal_pointer (&priv->title));
+  priv->title = pop_desktop_widget_gis_launcher_title ();
+  gis_page_set_title(gis_page,  priv->title);
 }
 
 static void gis_pop_launcher_page_realize(GtkWidget *gis_page) {
@@ -58,40 +61,11 @@ static void gis_pop_launcher_page_class_init(GisPopLauncherPageClass *klass) {
 }
 
 static void gis_pop_launcher_page_init(GisPopLauncherPage *page) {
-  g_resources_register(pop_launcher_get_resource());
-
   GisPopLauncherPage *priv = gis_pop_launcher_page_get_instance_private(page);
-  priv->header = g_object_new(GIS_TYPE_PAGE_HEADER, "title", title(), NULL);
+  priv->title = pop_desktop_widget_gis_launcher_title();
+  priv->header = g_object_new(GIS_TYPE_PAGE_HEADER, "title",  priv->title, NULL);
 
-  gis_page_set_title(GIS_PAGE(page), _("Pop Launcher"));
-
-  GtkWidget *description = gtk_label_new(_(
-    "Press Super key or use an icon in the dock to display the Launcher search field. Use "
-    "arrow keys to quickly switch between open windows or type the name of the application "
-    "to launch it. The Launcher makes navigating the desktop faster and more fluid."
-  ));
-
-  gtk_label_set_line_wrap(GTK_LABEL(description), TRUE);
-  gtk_label_set_justify(GTK_LABEL(description), GTK_JUSTIFY_CENTER);
-
-  GtkWidget *image = gtk_image_new_from_resource("/org/gnome/initial-setup/pop-launcher.png");
-  gtk_widget_set_vexpand(image, TRUE);
-  gtk_widget_set_halign(image, GTK_ALIGN_CENTER);
-  gtk_widget_set_valign(image, GTK_ALIGN_START);
-  gtk_widget_set_margin_top(image, 32);
-
-  GtkWidget *extra_notice = gtk_label_new(_(
-    "Super key configuration can be changed at any time from the Settings application."
-  ));
-
-  GtkWidget *container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_widget_set_halign(container, GTK_ALIGN_CENTER);
-  gtk_container_add(GTK_CONTAINER(container), priv->header);
-  gtk_container_add(GTK_CONTAINER(container), description);
-  gtk_container_add(GTK_CONTAINER(container), image);
-  gtk_container_add(GTK_CONTAINER(container), extra_notice);
-
-  gtk_container_add(GTK_CONTAINER(&priv->parent_instance), container);
+  gtk_container_add(GTK_CONTAINER(&priv->parent_instance), pop_desktop_widget_gis_launcher_page(priv->header));
   gtk_widget_set_vexpand(GTK_WIDGET(priv), TRUE);
   gtk_widget_show_all(GTK_WIDGET(priv));
   gtk_widget_set_margin_top(GTK_WIDGET(priv), 48);

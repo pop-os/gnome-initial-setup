@@ -15,22 +15,26 @@
 struct _GisPopPanelPage {
   GisPage parent_instance;
   GtkWidget *header;
+  char *title;
 };
 
 typedef struct _GisPopPanelPage GisPopPanelPage;
 
 G_DEFINE_TYPE(GisPopPanelPage, gis_pop_panel_page, GIS_TYPE_PAGE)
 
-static char *title() {
-  return _("Configure the Top Bar");
-}
-
 static void gis_pop_panel_page_dispose(GObject *object) {
+  GisPopPanelPage *priv = gis_pop_panel_page_get_instance_private(GIS_POP_PANEL_PAGE(object));
+  pop_desktop_widget_string_free (g_steal_pointer (&priv->title));
+
   G_OBJECT_CLASS(gis_pop_panel_page_parent_class)->dispose(object);
 }
 
 static void gis_pop_panel_page_locale_changed(GisPage *gis_page) {
-  gis_page_set_title(gis_page, title());
+  GisPopPanelPage *priv = gis_pop_panel_page_get_instance_private(GIS_POP_PANEL_PAGE(gis_page));
+  pop_desktop_widget_localize ();
+  pop_desktop_widget_string_free (g_steal_pointer (&priv->title));
+  priv->title = pop_desktop_widget_gis_panel_title ();
+  gis_page_set_title(gis_page, priv->title);
 }
 
 static void gis_pop_panel_page_realize(GtkWidget *gis_page) {
@@ -57,10 +61,9 @@ static void gis_pop_panel_page_class_init(GisPopPanelPageClass *klass) {
 }
 
 static void gis_pop_panel_page_init(GisPopPanelPage *page) {
-  gis_page_set_title(GIS_PAGE(page), _("Pop Panel"));
-
   GisPopPanelPage *priv = gis_pop_panel_page_get_instance_private(page);
-  priv->header = g_object_new(GIS_TYPE_PAGE_HEADER, "title", title(), NULL);
+  priv->title = pop_desktop_widget_gis_panel_title();
+  priv->header = g_object_new(GIS_TYPE_PAGE_HEADER, "title", priv->title, NULL);
 
   gtk_container_add(GTK_CONTAINER(&priv->parent_instance), pop_desktop_widget_gis_panel_page(priv->header));
   gtk_widget_show_all(GTK_WIDGET(priv));
