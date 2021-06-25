@@ -1018,7 +1018,7 @@ gboolean gis_driver_show_updated_features(GisDriver *driver) {
 
 void gis_driver_set_show_updated_features(GisDriver *driver, gboolean value) {
   GisDriverPrivate *priv = gis_driver_get_instance_private (driver);
-  return priv->show_updated_features = value;
+  priv->show_updated_features = value;
 }
 
 GisDriver *
