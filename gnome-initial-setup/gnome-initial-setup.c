@@ -65,29 +65,30 @@ typedef struct {
   const gchar *page_id;
   PreparePage prepare_page_func;
   gboolean new_user_only;
+  gboolean new_feature;
 } PageData;
 
-#define PAGE(name, new_user_only) { #name, gis_prepare_ ## name ## _page, new_user_only }
+#define PAGE(name, new_user_only, new_feature) { #name, gis_prepare_ ## name ## _page, new_user_only, new_feature }
 
 static PageData page_table[] = {
-  PAGE (language, FALSE),
-  PAGE (keyboard, FALSE),
-  PAGE (pop_dock, FALSE),
-  PAGE (pop_panel, FALSE),
-  PAGE (pop_launcher, FALSE),
-  PAGE (pop_gesture, FALSE),
-//  PAGE (appearance, FALSE),
-  PAGE (network,  FALSE),
-  PAGE (privacy,  FALSE),
-  PAGE (timezone, TRUE),
-  PAGE (goa,      FALSE),
-  PAGE (account,  TRUE),
-  PAGE (password, TRUE),
+  PAGE (language, FALSE, FALSE),
+  PAGE (keyboard, FALSE, FALSE),
+  PAGE (pop_dock, FALSE, TRUE),
+  PAGE (pop_panel, FALSE, TRUE),
+  PAGE (pop_launcher, FALSE, TRUE),
+  PAGE (pop_gesture, FALSE, TRUE),
+//  PAGE (appearance, FALSE, FALSE),
+  PAGE (network,  FALSE, FALSE),
+  PAGE (privacy,  FALSE, FALSE),
+  PAGE (timezone, TRUE, FALSE),
+  PAGE (goa,      FALSE, FALSE),
+  PAGE (account,  TRUE, FALSE),
+  PAGE (password, TRUE, FALSE),
 #ifdef HAVE_PARENTAL_CONTROLS
-  PAGE (parental_controls, TRUE),
-  PAGE (parent_password, TRUE),
+  PAGE (parental_controls, TRUE, FALSE),
+  PAGE (parent_password, TRUE, FALSE),
 #endif
-  PAGE (summary,  FALSE),
+  PAGE (summary,  FALSE, TRUE),
   { NULL },
 };
 
@@ -212,11 +213,12 @@ rebuild_pages_cb (GisDriver *driver)
   skip_pages = pages_to_skip_from_file (driver, is_new_user);
 
   for (; page_data->page_id != NULL; ++page_data) {
-    skipped = FALSE;
-
-    if ((page_data->new_user_only && !is_new_user) ||
-        (should_skip_page (page_data->page_id, skip_pages)))
-      skipped = TRUE;
+    if (gis_driver_show_updated_features (driver)) {
+      skipped = !page_data->new_feature;
+    } else {
+      skipped = (page_data->new_user_only && !is_new_user)
+        || (should_skip_page (page_data->page_id, skip_pages));
+    }
 
     page = page_data->prepare_page_func (driver);
     if (!page)
@@ -240,6 +242,24 @@ get_mode (void)
     return GIS_DRIVER_MODE_NEW_USER;
 }
 
+gchar *done_path () {
+  return g_build_filename (g_get_user_config_dir (), "gnome-initial-setup-done", NULL);
+}
+
+int initial_setup_check () {
+  gchar *path = done_path ();
+  gchar *output = NULL;
+
+  g_file_get_contents (path, &output, NULL, NULL);
+
+  int mode = output == NULL ? 0 : 0 != g_strcmp0(output, "21.04") ? 1 : 2;
+
+  g_free(path);
+  g_free(output);
+
+  return mode;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -247,6 +267,12 @@ main (int argc, char *argv[])
   int status;
   GOptionContext *context;
   GisDriverMode mode;
+
+  int initial_mode = initial_setup_check ();
+
+  if (initial_mode == 2) {
+    return 0;
+  }
 
   GOptionEntry entries[] = {
     { "existing-user", 0, 0, G_OPTION_ARG_NONE, &force_existing_user_mode,
@@ -291,6 +317,7 @@ main (int argc, char *argv[])
     gis_ensure_login_keyring ();
 
   driver = gis_driver_new (mode);
+  gis_driver_set_show_updated_features (driver, initial_mode == 1);
   g_signal_connect (driver, "rebuild-pages", G_CALLBACK (rebuild_pages_cb), NULL);
   status = g_application_run (G_APPLICATION (driver), argc, argv);
 
@@ -304,11 +331,10 @@ main (int argc, char *argv[])
 void
 gis_ensure_stamp_files (void)
 {
-  gchar *file;
+  gchar *file = done_path ();
   GError *error = NULL;
 
-  file = g_build_filename (g_get_user_config_dir (), "gnome-initial-setup-done", NULL);
-  if (!g_file_set_contents (file, "yes", -1, &error)) {
+  if (!g_file_set_contents (file, "21.04", -1, &error)) {
       g_warning ("Unable to create %s: %s", file, error->message);
       g_clear_error (&error);
   }

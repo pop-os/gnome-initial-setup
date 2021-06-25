@@ -142,6 +142,10 @@ gchar *gis_driver_conf_get_string (GisDriver *driver,
                                    const gchar *group,
                                    const gchar *key);
 
+gboolean gis_driver_show_updated_features(GisDriver *driver);
+
+void gis_driver_set_show_updated_features(GisDriver *driver, gboolean value);
+
 GisDriver *gis_driver_new (GisDriverMode mode);
 
 G_END_DECLS

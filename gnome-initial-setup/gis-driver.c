@@ -97,6 +97,8 @@ struct _GisDriverPrivate {
   locale_t locale;
 
   GKeyFile *vendor_conf_file;
+
+  gboolean show_updated_features;
 };
 typedef struct _GisDriverPrivate GisDriverPrivate;
 
@@ -1007,6 +1009,16 @@ gis_driver_save_data (GisDriver *driver)
     }
 
   gis_assistant_save_data (priv->assistant);
+}
+
+gboolean gis_driver_show_updated_features(GisDriver *driver) {
+  GisDriverPrivate *priv = gis_driver_get_instance_private (driver);
+  return priv->show_updated_features;
+}
+
+void gis_driver_set_show_updated_features(GisDriver *driver, gboolean value) {
+  GisDriverPrivate *priv = gis_driver_get_instance_private (driver);
+  return priv->show_updated_features = value;
 }
 
 GisDriver *
