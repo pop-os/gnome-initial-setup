@@ -82,7 +82,7 @@ static PageData page_table[] = {
 //  PAGE (appearance, FALSE, FALSE),
   PAGE (network,  FALSE, FALSE),
   PAGE (privacy,  FALSE, FALSE),
-  PAGE (timezone, TRUE, FALSE),
+  PAGE (timezone, FALSE, FALSE),
   PAGE (goa,      FALSE, FALSE),
   PAGE (account,  TRUE, FALSE),
   PAGE (password, TRUE, FALSE),
