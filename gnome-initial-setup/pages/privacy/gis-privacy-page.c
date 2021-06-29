@@ -127,8 +127,8 @@ gis_privacy_page_constructed (GObject *object)
   priv->location_settings = g_settings_new ("org.gnome.system.location");
   priv->privacy_settings = g_settings_new ("org.gnome.desktop.privacy");
 
-  gtk_switch_set_active (GTK_SWITCH (priv->location_switch), TRUE);
-  gtk_switch_set_active (GTK_SWITCH (priv->reporting_switch), TRUE);
+  gtk_switch_set_active (GTK_SWITCH (priv->location_switch), FALSE);
+  gtk_switch_set_active (GTK_SWITCH (priv->reporting_switch), FALSE);
 
   update_os_data (page);
 
