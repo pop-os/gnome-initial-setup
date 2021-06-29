@@ -248,13 +248,20 @@ gchar *done_path () {
   return g_build_filename (g_get_user_config_dir (), "gnome-initial-setup-done", NULL);
 }
 
+const int CHECK_CONTINUE = 0;
+const int CHECK_UPGRADE = 1;
+const int CHECK_EXIT = 2;
+
 int initial_setup_check () {
+  // System accounts like the installer have a UID below 1000. Bail on these.
+  if (getuid () < 1000) return CHECK_EXIT;
+
   g_autofree gchar *path = done_path ();
   g_autofree gchar *output = NULL;
 
   g_file_get_contents (path, &output, NULL, NULL);
 
-  return output == NULL ? 0 : 0 != g_strcmp0(output, "21.04") ? 1 : 2;
+  return output == NULL ? CHECK_CONTINUE : 0 != g_strcmp0(output, "21.04") ? CHECK_UPGRADE : CHECK_EXIT;
 }
 
 int
@@ -267,7 +274,7 @@ main (int argc, char *argv[])
 
   int initial_mode = initial_setup_check ();
 
-  if (initial_mode == 2) {
+  if (initial_mode == CHECK_EXIT) {
     return 0;
   }
 
@@ -314,7 +321,7 @@ main (int argc, char *argv[])
     gis_ensure_login_keyring ();
 
   driver = gis_driver_new (mode);
-  gis_driver_set_show_updated_features (driver, initial_mode == 1);
+  gis_driver_set_show_updated_features (driver, initial_mode == CHECK_UPGRADE);
   g_signal_connect (driver, "rebuild-pages", G_CALLBACK (rebuild_pages_cb), NULL);
   status = g_application_run (G_APPLICATION (driver), argc, argv);
 
