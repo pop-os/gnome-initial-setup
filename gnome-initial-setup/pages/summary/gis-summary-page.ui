@@ -18,9 +18,7 @@
             <child type="center">
               <object class="GtkImage" id="image">
                 <property name="visible">True</property>
-                <property name="resource">/org/gnome/initial-setup/ready-to-go.svg</property>
-                <property name="width_request">128</property>
-                <property name="height_request">128</property>
+                <property name="resource">/org/gnome/initial-setup/ready-to-go.png</property>
               </object>
               <packing>
                 <property name="pack_type">start</property>

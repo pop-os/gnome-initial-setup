@@ -38,6 +38,7 @@
 #define SERVICE_NAME "gdm-password"
 
 struct _GisSummaryPagePrivate {
+  GtkWidget *image;
   GtkWidget *summary_title;
   GtkWidget *start_button;
   GtkWidget *start_button_label;
@@ -518,6 +519,16 @@ gis_summary_page_constructed (GObject *object)
     }
 
     gis_summary_page_scale_switchable_images (priv);
+  } else {
+    gtk_image_set_from_pixbuf (
+      GTK_IMAGE (priv->image),
+      gdk_pixbuf_scale_simple (
+        gtk_image_get_pixbuf (GTK_IMAGE (priv->image)),
+        250,  // scale_w
+        250,  // scale_h
+        GDK_INTERP_BILINEAR
+      )
+    );
   }
 
   update_distro_name (page);
@@ -561,6 +572,7 @@ gis_summary_page_class_init (GisSummaryPageClass *klass)
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_image);
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, right_panel_description);
   } else {
+    gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, image);
     gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisSummaryPage, tagline);
   }
 
