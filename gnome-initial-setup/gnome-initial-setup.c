@@ -73,7 +73,8 @@ typedef struct {
 #define PAGE(name, new_user_only, existing_user_only, new_feature) { #name, gis_prepare_ ## name ## _page, new_user_only, existing_user_only, new_feature }
 
 static PageData page_table[] = {
-  PAGE (language, TRUE, FALSE, FALSE),
+  // Disable language screen in all modes
+  // PAGE (language, FALSE, FALSE, FALSE),
   PAGE (keyboard, TRUE, FALSE, FALSE),
   PAGE (pop_dock, FALSE, TRUE, TRUE),
   PAGE (pop_panel, FALSE, TRUE, TRUE),
