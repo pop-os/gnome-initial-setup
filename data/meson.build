@@ -29,7 +29,6 @@ foreach desktop_file: autostart_files
 endforeach
 
 i18n.merge_file(
-    'desktop',
     input: configure_file(
         input: files('gnome-initial-setup.desktop.in.in'),
         output: 'gnome-initial-setup.desktop.in',
