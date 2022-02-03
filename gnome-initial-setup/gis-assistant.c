@@ -232,6 +232,7 @@ update_navigation_buttons (GisAssistant *assistant)
 
       if (gis_page_get_complete (page)) {
         set_suggested_action_sensitive (next_widget, TRUE);
+        gtk_widget_grab_focus (next_widget);
         set_navigation_button (assistant, next_widget);
       } else if (gis_page_get_skippable (page)) {
         set_navigation_button (assistant, priv->skip);
