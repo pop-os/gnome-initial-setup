@@ -31,6 +31,7 @@
 
 #include <locale.h>
 #include <gtk/gtk.h>
+#include <pop_analytics_panel.h>
 
 #include "gis-page-header.h"
 
@@ -42,6 +43,7 @@ struct _GisPrivacyPagePrivate
   GtkWidget *reporting_label;
   GtkWidget *mozilla_privacy_policy_label;
   GtkWidget *distro_privacy_policy_label;
+  GtkWidget *analytics_content;
   GSettings *location_settings;
   GSettings *privacy_settings;
   guint abrt_watch_id;
@@ -123,6 +125,8 @@ gis_privacy_page_constructed (GObject *object)
   G_OBJECT_CLASS (gis_privacy_page_parent_class)->constructed (object);
 
   gis_page_set_complete (GIS_PAGE (page), TRUE);
+
+  pop_analytics_panel_summary_attach (priv->analytics_content);
 
   priv->location_settings = g_settings_new ("org.gnome.system.location");
   priv->privacy_settings = g_settings_new ("org.gnome.desktop.privacy");
@@ -259,6 +263,7 @@ gis_privacy_page_class_init (GisPrivacyPageClass *klass)
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisPrivacyPage, reporting_label);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisPrivacyPage, mozilla_privacy_policy_label);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisPrivacyPage, distro_privacy_policy_label);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), GisPrivacyPage, analytics_content);
   gtk_widget_class_bind_template_callback (GTK_WIDGET_CLASS (klass), activate_link);
 
   page_class->page_id = PAGE_ID;
@@ -271,6 +276,7 @@ gis_privacy_page_class_init (GisPrivacyPageClass *klass)
 static void
 gis_privacy_page_init (GisPrivacyPage *page)
 {
+  pop_analytics_panel_init ();
   g_resources_register (privacy_get_resource ());
   g_type_ensure (GIS_TYPE_PAGE_HEADER);
   gtk_widget_init_template (GTK_WIDGET (page));
