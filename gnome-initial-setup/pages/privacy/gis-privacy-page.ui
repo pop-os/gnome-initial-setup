@@ -18,6 +18,7 @@
             <property name="show_icon" bind-source="GisPrivacyPage" bind-property="small-screen" bind-flags="invert-boolean|sync-create"/>
           </object>
         </child>
+        <child><object class="GtkBox" id="analytics_content"></object></child>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
