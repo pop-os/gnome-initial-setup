@@ -126,7 +126,11 @@ gis_privacy_page_constructed (GObject *object)
 
   gis_page_set_complete (GIS_PAGE (page), TRUE);
 
-  pop_analytics_panel_summary_attach (priv->analytics_content);
+  if (pop_analytics_panel_should_show ())
+    {
+      pop_analytics_panel_summary_attach (priv->analytics_content);
+      gtk_widget_show_all (priv->analytics_content);
+    }
 
   priv->location_settings = g_settings_new ("org.gnome.system.location");
   priv->privacy_settings = g_settings_new ("org.gnome.desktop.privacy");
