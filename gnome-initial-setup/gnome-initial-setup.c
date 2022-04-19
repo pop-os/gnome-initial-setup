@@ -32,6 +32,7 @@
 #include <cheese-gtk.h>
 #endif
 
+#include "pages/analytics/gis-analytics-page.h"
 #include "pages/appearance/gis-appearance-page.h"
 #include "pages/eula/gis-eula-page.h"
 #include "pages/language/gis-language-page.h"
@@ -86,6 +87,7 @@ static PageData page_table[] = {
   PAGE (appearance, FALSE, TRUE, TRUE),
   PAGE (network,  FALSE, FALSE, FALSE),
   PAGE (privacy,  FALSE, FALSE, FALSE),
+  PAGE (analytics,  FALSE, FALSE, FALSE),
   PAGE (timezone, FALSE, FALSE, FALSE),
   PAGE (goa,      FALSE, FALSE, FALSE),
   PAGE (account,  TRUE, FALSE, FALSE),
