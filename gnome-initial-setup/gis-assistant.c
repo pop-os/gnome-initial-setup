@@ -255,6 +255,11 @@ update_navigation_buttons (GisAssistant *assistant)
       } else {
         set_suggested_action_sensitive (next_widget, FALSE);
         set_navigation_button (assistant, next_widget);
+
+        if (gis_page_get_needs_accept (page)) {
+          // Special code for analytics page
+          gtk_widget_hide (priv->accept);
+        }
       }
     }
 }

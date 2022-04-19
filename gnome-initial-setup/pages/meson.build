@@ -5,6 +5,7 @@ pages = [
    'pop-gesture',
    'pop-extensions',
    'account',
+   'analytics',
    'appearance',
    'eula',
    'language',

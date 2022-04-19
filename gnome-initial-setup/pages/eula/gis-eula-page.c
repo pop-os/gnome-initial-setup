@@ -60,7 +60,7 @@ static void gis_eula_page_constructed (GObject *object) {
         pop_analytics_panel_eula_attach (GTK_CONTAINER (widget));
     } else {
         // Skip page
-        gtk_widget_set_visible (page, FALSE);
+        gtk_widget_set_visible (GTK_WIDGET (page), FALSE);
     }
 }
 
