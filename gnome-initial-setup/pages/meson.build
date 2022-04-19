@@ -6,6 +6,7 @@ pages = [
    'pop-extensions',
    'account',
    'appearance',
+   'eula',
    'language',
    'keyboard',
    'network',

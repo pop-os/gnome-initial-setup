@@ -171,7 +171,13 @@ gis_assistant_previous_page (GisAssistant *assistant)
 {
   GisAssistantPrivate *priv = gis_assistant_get_instance_private (assistant);
   g_return_if_fail (priv->current_page != NULL);
-  switch_to (assistant, find_prev_page (priv->current_page));
+  GisPage *prev_page = find_prev_page (priv->current_page);
+  if (prev_page == NULL) {
+      // Special code for EULA page
+      g_spawn_command_line_async ("gnome-session-quit --power-off", NULL);
+  } else {
+      switch_to (assistant, prev_page);
+  }
 }
 
 static void
@@ -222,13 +228,23 @@ update_navigation_buttons (GisAssistant *assistant)
       gboolean is_first_page;
       GtkWidget *next_widget;
 
-      is_first_page = (page_priv->link->prev == NULL);
+      is_first_page = (find_prev_page (page) == NULL);
       gtk_widget_set_visible (priv->back, !is_first_page);
+      gtk_button_set_label (GTK_BUTTON (priv->back), _("_Previous"));
 
-      if (gis_page_get_needs_accept (page))
+      if (gis_page_get_needs_accept (page)) {
         next_widget = priv->accept;
-      else
+        if (is_first_page) {
+            // Special code for EULA page
+            gtk_widget_set_visible (priv->back, TRUE);
+            gtk_button_set_label (GTK_BUTTON (priv->back), _("_Decline and Power Off"));
+            gtk_button_set_label (GTK_BUTTON (priv->accept), _("_Agree and Continue"));
+        } else {
+            gtk_button_set_label (GTK_BUTTON (priv->accept), _("_Accept"));
+        }
+      } else {
         next_widget = priv->forward;
+      }
 
       if (gis_page_get_complete (page)) {
         set_suggested_action_sensitive (next_widget, TRUE);
@@ -253,7 +269,7 @@ update_applying_state (GisAssistant *assistant)
   if (priv->current_page)
     {
       applying = gis_page_get_applying (priv->current_page);
-      is_first_page = priv->current_page->assistant_priv->link->prev == NULL;
+      is_first_page = find_prev_page(priv->current_page) == NULL;
     }
   gtk_widget_set_sensitive (priv->forward, !applying);
   gtk_widget_set_visible (priv->back, !applying && !is_first_page);

@@ -33,6 +33,7 @@
 #endif
 
 #include "pages/appearance/gis-appearance-page.h"
+#include "pages/eula/gis-eula-page.h"
 #include "pages/language/gis-language-page.h"
 #include "pages/keyboard/gis-keyboard-page.h"
 #include "pages/network/gis-network-page.h"
@@ -75,6 +76,7 @@ typedef struct {
 static PageData page_table[] = {
   // Disable language screen in all modes
   // PAGE (language, FALSE, FALSE, FALSE),
+  PAGE (eula, FALSE, FALSE, FALSE),
   PAGE (keyboard, TRUE, FALSE, FALSE),
   PAGE (pop_dock, FALSE, TRUE, TRUE),
   PAGE (pop_panel, FALSE, TRUE, TRUE),
