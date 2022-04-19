@@ -55,7 +55,7 @@ static void gis_eula_page_constructed (GObject *object) {
     gis_page_set_complete (GIS_PAGE (page), TRUE);
     gis_page_set_needs_accept (GIS_PAGE(page), TRUE);
 
-    if (pop_analytics_panel_should_show () || TRUE) {
+    if (pop_analytics_panel_should_show ()) {
         // Add EULA, consumes widget
         pop_analytics_panel_eula_attach (GTK_CONTAINER (widget));
     } else {
