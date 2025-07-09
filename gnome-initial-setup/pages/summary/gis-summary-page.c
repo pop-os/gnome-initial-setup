@@ -408,7 +408,7 @@ ext_displays_require_dgpu ()
       "com.system76.PowerDaemon",
       "/com/system76/PowerDaemon",
       "com.system76.PowerDaemon",
-      "GetExternalDisplaysRequireDGPU",
+      "GetExternalDisplaysRequireDgpu",
       NULL,
       G_VARIANT_TYPE("(b)"),
       G_DBUS_CALL_FLAGS_NONE,
